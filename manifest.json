@@ -1,0 +1,16 @@
+{
+  "name": "GIT Surgery",
+  "short_name": "GIT Surgery",
+  "description": "Surgery II revision: Upper GI, Small Bowel, Colon, Appendix and Anorectal.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "icon.png", "sizes": "192x192 512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
