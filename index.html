@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="description" content="GIT Surgery — Surgery II revision: Upper GI." />
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="GIT Surgery" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="icon" type="image/png" href="icon.png" />
+<link rel="manifest" href="manifest.json" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet" />
+
+<title>GIT Surgery</title>
+
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; margin: 0; padding: 0; background: #000; }
+  body {
+    font-family: "Spectral", Georgia, serif;
+    color: #e2e8f0;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  button { font-family: inherit; }
+
+  /* Shell */
+  .app { height: 100%; display: flex; flex-direction: column; background: #000; }
+  .topbar {
+    flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
+    padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+    background: rgba(8,8,8,0.92); border-bottom: 1px solid #1e1e1e;
+  }
+  .topbar__back {
+    border: 1px solid #22c55e44; background: #22c55e14; color: #22c55e;
+    border-radius: 18px; padding: 6px 13px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .topbar__title { flex: 1; text-align: center; font-size: 11px; letter-spacing: .21em; text-transform: uppercase; color: #4e6280; }
+  .topbar__spacer { width: 64px; }
+
+  /* The modules call resetScrollTop() on #caliph-module-scroll — keep this id */
+  #caliph-module-scroll {
+    flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch;
+    padding-bottom: env(safe-area-inset-bottom); scrollbar-width: none;
+  }
+  #caliph-module-scroll::-webkit-scrollbar { display: none; }
+  .caliph-wrap { background: #000; min-height: 100%; }
+  .caliph-wrap, .caliph-wrap * { -webkit-tap-highlight-color: transparent; }
+  .caliph-wrap .surg-serif-scope, .caliph-wrap .surg-serif-scope * { font-family: 'Spectral', serif !important; }
+
+  /* Home */
+  .home { max-width: 520px; margin: 0 auto; padding: 34px 18px 60px; }
+  .home__eyebrow { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #4e6280; text-align: center; }
+  .home__title {
+    font-size: 34px; font-weight: 800; text-align: center; margin: 6px 0 4px; letter-spacing: -.5px;
+    background: linear-gradient(135deg,#fff 15%,#22c55e 60%,#15803d 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .home__sub { text-align: center; color: #94a3b8; font-size: 14px; margin: 0 0 28px; line-height: 1.6; }
+  .tile {
+    display: block; width: 100%; text-align: left; cursor: pointer; margin-bottom: 14px;
+    padding: 18px 18px 16px; border-radius: 16px; color: #e2e8f0;
+    border: 1px solid var(--c)55; border-left: 4px solid var(--c);
+    background: linear-gradient(135deg, var(--c)1c, #0c0c0c 70%);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .tile:active { transform: scale(.985); box-shadow: 0 0 22px -6px var(--c); }
+  .tile__part { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--c); font-weight: 700; }
+  .tile__name { font-size: 21px; font-weight: 700; margin: 4px 0 6px; }
+  .tile__desc { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .tile__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+  .chip { font-size: 10.5px; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--c)44; color: var(--c); }
+  .tile__resume { margin-top: 10px; font-size: 11px; color: #4e6280; }
+  .home__foot { text-align: center; font-size: 11px; color: #3f4a5e; margin-top: 26px; font-family: 'JetBrains Mono', monospace; }
+
+  /* ═══ Decree pop-up ═══ */
+  .decree {
+    --gold:#e8c46a; --gold2:#a8801f; --blood:#b3122b;
+    position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
+    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);
+    background: radial-gradient(ellipse at 50% 30%, #3a0510 0%, #12020a 45%, #000 80%);
+    overflow: hidden; animation: dcFade .5s ease-out both;
+  }
+  .decree--out { animation: dcOut .6s ease-in both; pointer-events: none; }
+  @keyframes dcFade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes dcOut { to { opacity: 0; transform: scale(1.06); filter: blur(6px) } }
+  .decree__ember {
+    position: absolute; bottom: -10px; border-radius: 50%; background: #ff7a3c;
+    box-shadow: 0 0 8px 2px rgba(255,110,40,.7); opacity: 0;
+    animation: dcRise linear infinite;
+  }
+  @keyframes dcRise { 0% { transform: translateY(0) translateX(0); opacity: 0 } 12% { opacity: .9 }
+    100% { transform: translateY(-105vh) translateX(var(--dx)); opacity: 0 } }
+  .decree__card {
+    position: relative; width: 100%; max-width: 410px; max-height: 100%; overflow-y: auto; scrollbar-width: none;
+    text-align: center; padding: 30px 22px 26px; border-radius: 4px;
+    background: linear-gradient(180deg, rgba(30,4,12,.94), rgba(6,1,3,.97));
+    border: 1px solid var(--gold2);
+    box-shadow: 0 0 0 5px #000, 0 0 0 6px rgba(232,196,106,.35), 0 0 70px -8px rgba(179,18,43,.75), inset 0 0 60px rgba(179,18,43,.18);
+    animation: dcRiseIn 1s cubic-bezier(.2,.8,.2,1) .15s both;
+  }
+  .decree__card::-webkit-scrollbar { display: none; }
+  @keyframes dcRiseIn { from { opacity: 0; transform: translateY(26px) scale(.96) } to { opacity: 1; transform: none } }
+  .decree__corner { position: absolute; width: 22px; height: 22px; border: 2px solid var(--gold); opacity: .9; }
+  .decree__corner--tl { top: 7px; left: 7px; border-right: 0; border-bottom: 0; }
+  .decree__corner--tr { top: 7px; right: 7px; border-left: 0; border-bottom: 0; }
+  .decree__corner--bl { bottom: 7px; left: 7px; border-right: 0; border-top: 0; }
+  .decree__corner--br { bottom: 7px; right: 7px; border-left: 0; border-top: 0; }
+  .decree__sigil { width: 96px; height: 96px; margin: 0 auto 10px; filter: drop-shadow(0 0 10px rgba(232,196,106,.55)); }
+  .decree__sigil .ring { transform-origin: 50% 50%; animation: dcSpin 40s linear infinite; }
+  .decree__sigil .ring2 { transform-origin: 50% 50%; animation: dcSpin 26s linear infinite reverse; }
+  .decree__sigil .iris { animation: dcPulse 3.2s ease-in-out infinite; transform-origin: 50% 50%; }
+  @keyframes dcSpin { to { transform: rotate(360deg) } }
+  @keyframes dcPulse { 0%,100% { opacity: .85; transform: scale(1) } 50% { opacity: 1; transform: scale(1.18) } }
+  .decree__eyebrow { font: 500 10px/1 "Cinzel", Georgia, serif; letter-spacing: .42em; text-transform: uppercase; color: var(--blood); filter: brightness(1.5); }
+  .decree__title {
+    margin: 12px 0 0; font: 900 25px/1.2 "Cinzel Decorative", "Cinzel", Georgia, serif; letter-spacing: .04em; text-transform: uppercase;
+    background: linear-gradient(180deg, #fff6d6 0%, var(--gold) 45%, var(--gold2) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,.8));
+  }
+  .decree__rule { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: var(--gold); font-size: 12px; }
+  .decree__rule::before, .decree__rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold2)); }
+  .decree__rule::after { transform: scaleX(-1); }
+  .decree__by { font: italic 600 17px/1.2 "Cormorant Garamond", Georgia, serif; color: #cdbfa0; letter-spacing: .04em; }
+  .decree__hh { margin-top: 12px; font: 500 12px/1 "Cinzel", Georgia, serif; letter-spacing: .5em; text-transform: uppercase; color: var(--gold); }
+  .decree__name {
+    margin: 8px 0 0; font: 900 31px/1.1 "Cinzel Decorative", "Cinzel", Georgia, serif; text-transform: uppercase;
+    background: linear-gradient(100deg, var(--gold2) 20%, #fff7da 45%, var(--gold) 55%, var(--gold2) 80%);
+    background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: dcShine 4.5s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(179,18,43,.7));
+  }
+  @keyframes dcShine { 0% { background-position: 120% 0 } 100% { background-position: -120% 0 } }
+  .decree__titles { margin-top: 16px; font: italic 600 18px/1.45 "Cormorant Garamond", Georgia, serif; color: #e9dcc0; }
+  .decree__titles b { display: block; font-weight: 600; color: #ff5c73; letter-spacing: .02em; }
+  .decree__btn {
+    position: relative; margin-top: 26px; padding: 14px 30px; cursor: pointer; border-radius: 2px;
+    font: 700 12px/1 "Cinzel", Georgia, serif; letter-spacing: .32em; text-transform: uppercase; color: #1a0208;
+    background: linear-gradient(180deg, #f6dd9a, var(--gold) 50%, var(--gold2)); border: 0;
+    box-shadow: 0 0 0 1px #000, 0 0 0 2px var(--gold2), 0 8px 28px -6px rgba(179,18,43,.9);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .decree__btn:active { transform: scale(.96); filter: brightness(1.15); }
+  .decree__titles { cursor: pointer; min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+  .decree__title-swap { min-height: 72px; animation: dcSwap .7s ease-out both; }
+  @keyframes dcSwap { from { opacity: 0; transform: translateY(8px); filter: blur(3px) } to { opacity: 1; transform: none; filter: none } }
+  .decree__count { margin-top: 6px; font: 500 9px/1 "Cinzel", Georgia, serif; letter-spacing: .3em; text-transform: uppercase; color: #6d5a3a; }
+  .decree__humble { margin-top: 18px; font: italic 600 14px/1.3 "Cormorant Garamond", Georgia, serif; color: #b9a67a; letter-spacing: .06em; }
+  .decree__humble::before, .decree__humble::after { content: "\2014"; margin: 0 8px; color: var(--gold2); }
+  .decree__foot { margin-top: 12px; font: 500 9px/1.4 "Cinzel", Georgia, serif; letter-spacing: .28em; text-transform: uppercase; color: #6d5a3a; }
+  /* staged reveal */
+  .dc-s { opacity: 0; animation: dcStage .8s ease-out forwards; }
+  @keyframes dcStage { from { opacity: 0; transform: translateY(10px); letter-spacing: .12em } to { opacity: 1; transform: none } }
+  @media (max-width: 360px) { .decree__title { font-size: 21px } .decree__name { font-size: 26px } }
+  @media (prefers-reduced-motion: reduce) {
+    .decree *, .decree { animation-duration: .01s !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; }
+    .decree__ember { display: none }
+  }
+
+  /* ═══ LO panels + toggle ═══ */
+  .lo-panel { display: none; margin: 0 0 16px; padding: 13px 15px 12px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(251,191,36,.10), #0c0c0c 75%);
+    border: 1px solid rgba(251,191,36,.35); border-left: 3px solid #fbbf24; }
+  body.los-on .lo-panel { display: block; animation: loIn .25s ease; }
+  @keyframes loIn { from { opacity: 0; transform: translateY(5px) } to { opacity: 1; transform: none } }
+  .lo-panel__head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .lo-panel__code { font: 700 10px/1 'JetBrains Mono', monospace; color: #fbbf24; letter-spacing: .08em; padding: 3px 7px; border: 1px solid rgba(251,191,36,.45); border-radius: 6px; }
+  .lo-panel__topic { font-size: 14px; font-weight: 800; color: #f0f1f5; }
+  .lo-panel__tag { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: #a98a2c; margin-left: auto; }
+  .lo-panel ul { margin: 0; padding: 0; list-style: none; }
+  .lo-panel li { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.65; color: #cbd5e1; margin-top: 4px; }
+  .lo-panel li::before { content: "\25B8"; color: #fbbf24; flex-shrink: 0; }
+  .lo-toggle { position: absolute; top: 12px; right: 12px; z-index: 2; display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 16px; cursor: pointer; font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+    color: #a98a2c; background: transparent; border: 1px solid rgba(251,191,36,.28); transition: all .2s ease; }
+  .lo-toggle--on { color: #fbbf24; background: rgba(251,191,36,.14); border-color: rgba(251,191,36,.7); box-shadow: 0 0 12px -3px rgba(251,191,36,.6); }
+  .lo-toggle__dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; }
+  .lo-toggle--on .lo-toggle__dot { opacity: 1; }
+
+  /* ═══ Decree: all titles ═══ */
+  .decree__all-btn { margin-top: 14px; padding: 6px 4px; cursor: pointer; background: none; border: 0; border-bottom: 1px solid var(--gold2);
+    font: 500 10px/1 "Cinzel", Georgia, serif; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); }
+  .decree__all-btn:active { filter: brightness(1.3); }
+  .decree__all { position: absolute; z-index: 10; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 410px;
+    top: calc(env(safe-area-inset-top) + 16px); bottom: calc(env(safe-area-inset-bottom) + 16px);
+    display: flex; flex-direction: column; padding: 22px 16px 16px; border-radius: 4px; text-align: center;
+    background: linear-gradient(180deg, rgba(30,4,12,.98), rgba(6,1,3,.99)); border: 1px solid var(--gold2);
+    box-shadow: 0 0 0 5px #000, 0 0 0 6px rgba(232,196,106,.35), 0 0 70px -8px rgba(179,18,43,.75); animation: dcFade .3s ease-out both; }
+  .decree__all-head { font: 700 13px/1.3 "Cinzel", Georgia, serif; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); }
+  .decree__all-sub { margin: 6px 0 12px; font: 500 9px/1 "Cinzel", Georgia, serif; letter-spacing: .3em; text-transform: uppercase; color: #6d5a3a; }
+  .decree__all-list { flex: 1 1 auto; overflow-y: auto; scrollbar-width: none; text-align: left; margin: 0 -4px; padding: 0 4px; }
+  .decree__all-list::-webkit-scrollbar { display: none; }
+  .decree__all-item { display: flex; gap: 10px; width: 100%; padding: 9px 6px; cursor: pointer; background: none; border: 0; border-bottom: 1px solid rgba(168,128,31,.2);
+    text-align: left; color: #e9dcc0; font: italic 600 15px/1.35 "Cormorant Garamond", Georgia, serif; }
+  .decree__all-item i { font-style: normal; flex: 0 0 24px; font: 500 10px/1.9 "Cinzel", Georgia, serif; color: #6d5a3a; letter-spacing: .08em; }
+  .decree__all-item b { color: #ff5c73; font-weight: 600; }
+  .decree__all-item--cur { background: rgba(232,196,106,.08); }
+  .decree__all-item--cur i { color: var(--gold); }
+  .decree__all .decree__btn { margin-top: 14px; padding: 12px 24px; align-self: center; }
+  .mcq-q { font-size: 13.5px; line-height: 1.75; color: #e2e8f0; margin: 10px 0 14px; }
+  .mcq-meta { display: flex; gap: 8px; align-items: center; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #a98a2c; }
+  .mcq-bar { height: 3px; background: #1c1c1c; border-radius: 2px; margin: 8px 0 4px; } .mcq-bar i { display: block; height: 100%; background: #fbbf24; border-radius: 2px; transition: width .3s; }
+  .mcq-opt { display: flex; gap: 10px; width: 100%; text-align: left; padding: 11px 12px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; font-size: 12.5px; line-height: 1.55; color: #cbd5e1; background: #0f0f0f; border: 1px solid #262626; }
+  .mcq-opt b { color: #fbbf24; flex: 0 0 16px; }
+  .mcq-opt--ok { border-color: #22c55e; background: rgba(34,197,94,.12); color: #e8fff0; }
+  .mcq-opt--no { border-color: #ef4444; background: rgba(239,68,68,.12); color: #ffecec; }
+  .mcq-exp { margin: 12px 0; padding: 12px 14px; border-left: 3px solid #22c55e; background: #0c0c0c; border-radius: 8px; font-size: 12.5px; line-height: 1.7; color: #cbd5e1; }
+  .mcq-btn { padding: 11px 22px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; color: #111; background: #fbbf24; border: 0; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+
+  <script>
+(function () {
+"use strict";
+const { useState, useEffect, useRef } = React;
+
+/* Modules call this when switching tabs, so each new tab starts at the top. */
+function resetScrollTop() {
+    const el = document.getElementById("caliph-module-scroll");
+    if (el) el.scrollTop = 0;
+}
+
+/* ══════════ GI SURGERY MODULES (extracted unchanged from the full app) ══════════ */
+function Surg2GIUpperModule({ initialTab, initialCard, onJump }) {
+    const [tab, setTab] = useState(initialTab || "anatomy");
+    const AC = "#22c55e";
+    const BG2 = "#000";
+    const S3 = "#111";
+    const BOR = "#1e1e1e";
+    const TX = "#e2e8f0";
+    const TX2 = "#94a3b8";
+    const TX3 = "#4e6280";
+    const FF2 = "system-ui,-apple-system,'Segoe UI',sans-serif";
+    const tabs = [
+        { id: "anatomy", label: "Anatomy", icon: "🗺️", color: "#22c55e" },
+        { id: "upperGI", label: "Esophagus/Stomach", icon: "🍽️", color: "#0ea5e9" },
+        { id: "inv", label: "Concepts", icon: "\uD83D\uDD2C", color: "#38bdf8" },
+        { id: "mcq", label: "MCQs", icon: "\uD83E\uDDEA", color: "#fbbf24" },
+    ];
+    /* ── shared micro-components — identical shape to sibling Surgery modules ── */
+    const H = ({ children, color }) => (React.createElement("div", { style: { fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase",
+            color: color || AC, marginBottom: 8, marginTop: 16, fontFamily: FF2 } }, children));
+    const BoxBase = ({ color, title, children }) => (React.createElement("div", { style: { background: S3, border: `1px solid ${color || BOR}`, borderLeft: `3px solid ${color || AC}`,
+            borderRadius: 10, padding: "13px 15px", marginBottom: 12, position: "relative", overflow: "hidden" } },
+        React.createElement("div", { style: { position: "absolute", top: 0, left: 3, bottom: 0, width: 40,
+                background: `linear-gradient(90deg,${color || AC}10,transparent)`, pointerEvents: "none" } }),
+        title && React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: color || AC, marginBottom: 6,
+                letterSpacing: "0.1em", textTransform: "uppercase", fontFamily: FF2 } }, title),
+        React.createElement("div", { style: { fontSize: 13, color: TX2, lineHeight: 1.75, fontFamily: FF2, position: "relative" } }, children)));
+    const Box = (p) => p.title === "Overview" ? React.createElement(OverviewToggle, { color: p.color, Base: BoxBase }, p.children) : BoxBase(p);
+    const Row = ({ label, val, sub, c }) => (React.createElement("div", { style: {
+            position: "relative", marginBottom: 9, padding: "12px 14px",
+            background: `linear-gradient(135deg, ${c || AC}10, ${S3})`,
+            border: `1px solid ${c || AC}2a`, borderLeft: `3px solid ${c || AC}`, borderRadius: 12,
+        } },
+        React.createElement("div", { style: { display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 } },
+            React.createElement("span", { style: { color: c || AC, fontSize: 9.5, flexShrink: 0 } }, "\u25C6"),
+            React.createElement("span", { style: { fontSize: 12.5, fontWeight: 800, color: TX, fontFamily: FF2, letterSpacing: "0.01em", lineHeight: 1.35 } }, label)),
+        React.createElement("div", { style: { fontSize: 12.5, color: TX2, lineHeight: 1.75, fontFamily: FF2 } }, val),
+        sub && React.createElement("div", { style: { fontSize: 11, color: TX3, marginTop: 7, paddingTop: 7, borderTop: `1px solid ${BOR}`, fontFamily: FF2 } }, sub)));
+    const List = ({ c, items }) => (React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 } }, items.map((it, i) => (React.createElement("div", { key: i, style: { fontSize: 12.5, color: TX2, lineHeight: 1.65, fontFamily: FF2, display: "flex", gap: 7 } },
+        React.createElement("span", { style: { color: c || AC, flexShrink: 0 } }, "\u2022"),
+        React.createElement("span", null, it))))));
+    const Table = ({ color, headers, rows }) => (React.createElement(Box, { color: color || AC }, rows.map((r, i) => (React.createElement("div", { key: i, style: {
+            marginBottom: i < rows.length - 1 ? 11 : 0, paddingBottom: i < rows.length - 1 ? 11 : 0,
+            borderBottom: i < rows.length - 1 ? `1px solid ${BOR}` : "none",
+        } },
+        React.createElement("div", { style: { fontWeight: 700, color: TX, fontSize: 12.5, marginBottom: 5, fontFamily: FF2 } }, r[0]),
+        r.slice(1).map((val, j) => (React.createElement("div", { key: j, style: { fontSize: 12.5, color: TX2, lineHeight: 1.6, fontFamily: FF2, marginTop: 4 } },
+            React.createElement("span", { style: { color: color || AC, fontWeight: 700, fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.05em" } },
+                headers[j + 1],
+                "  "),
+            val))))))));
+    const PillarCard = ({ n, total, title, body, color, icon }) => (React.createElement("div", { style: { position: "relative", display: "flex", gap: 7, marginBottom: n < total ? 3 : 12 } },
+        n < total && (React.createElement("div", { style: { position: "absolute", left: 9, top: 24, bottom: -3, width: 2, background: `linear-gradient(${color}, ${BOR})`, opacity: 0.5 } })),
+        React.createElement("div", { style: {
+                flexShrink: 0, width: 19, height: 19, borderRadius: "50%", position: "relative", zIndex: 1,
+                background: `linear-gradient(135deg, ${color}, ${color}bb)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 9.5, fontWeight: 900, color: "#04050a", fontFamily: FF2,
+                boxShadow: `0 0 12px -3px ${color}aa`,
+            } }, n),
+        React.createElement("div", { style: { flex: 1, minWidth: 0, marginBottom: 12, padding: "12px 15px", background: `linear-gradient(135deg, ${color}12, ${S3})`, border: `1px solid ${color}38`, borderRadius: 13 } },
+            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 6 } },
+                icon && React.createElement("span", { style: { fontSize: 14 } }, icon),
+                React.createElement("div", { style: { fontSize: 13.5, fontWeight: 800, color: TX, fontFamily: FF2, lineHeight: 1.35 } }, title)),
+            React.createElement("div", { style: { fontSize: 12.5, color: TX2, lineHeight: 1.75, fontFamily: FF2 } }, body))));
+    const SubHead = ({ color, icon, children }) => (React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, margin: "22px 0 12px" } },
+        React.createElement("div", { style: {
+                flexShrink: 0, padding: "5px 13px", borderRadius: 20,
+                background: `linear-gradient(135deg, ${color || AC}26, ${color || AC}08)`, border: `1px solid ${color || AC}4a`,
+                fontSize: 12.5, fontWeight: 700, color: color || AC, letterSpacing: "0.01em", whiteSpace: "nowrap",
+                fontFamily: "'Spectral',Georgia,serif",
+            } },
+            icon && React.createElement("span", { style: { marginRight: 6 } }, icon),
+            children),
+        React.createElement("div", { style: { flex: 1, height: 1, background: `linear-gradient(90deg, ${color || AC}55, transparent)` } })));
+    const Warn = ({ title, children }) => (React.createElement("div", { style: { background: "rgba(255,77,109,0.08)", border: "1px solid rgba(255,77,109,0.25)",
+            borderLeft: "3px solid #ff4d6d", borderRadius: 10, padding: "9px 12px", marginBottom: 8 } },
+        React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: "#ff4d6d", letterSpacing: "0.1em", marginBottom: 3, fontFamily: FF2 } },
+            "\u26A0 ",
+            title || "CRITICAL"),
+        React.createElement("div", { style: { fontSize: 12.5, color: TX2, lineHeight: 1.6, fontFamily: FF2 } }, children)));
+    const Tip = ({ children }) => (React.createElement("div", { style: { background: "rgba(255,213,0,0.06)", border: "1px solid rgba(255,213,0,0.18)",
+            borderLeft: "3px solid #ffd100", borderRadius: 10, padding: "8px 12px", marginBottom: 8 } },
+        React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: "#ffd100", letterSpacing: "0.1em", marginBottom: 3, fontFamily: FF2 } }, "\uD83D\uDCA1 PEARL"),
+        React.createElement("div", { style: { fontSize: 12.5, color: TX2, lineHeight: 1.6, fontFamily: FF2 } }, children)));
+    const Mnem = ({ title, items }) => (React.createElement("div", { style: { background: "rgba(76,201,240,0.06)", border: "1px solid rgba(76,201,240,0.2)",
+            borderRadius: 10, padding: "10px 13px", marginBottom: 8 } },
+        React.createElement("div", { style: { fontSize: 10, fontWeight: 800, color: "#4cc9f0", letterSpacing: "0.1em", marginBottom: 6, fontFamily: FF2 } },
+            "\u26A1 ",
+            title),
+        items.map((item, i) => (React.createElement("div", { key: i, style: { fontSize: 12, color: TX2, lineHeight: 1.7, fontFamily: FF2, paddingLeft: 4 } },
+            React.createElement("span", { style: { color: "#4cc9f0", fontWeight: 700 } }, item.split(/[:\-–]/)[0]),
+            item.includes(":") || item.includes("-") || item.includes("–") ? item.slice(item.search(/[:\-–]/)) : "")))));
+    const Ref = ({ children }) => (React.createElement("div", { style: { fontSize: 10, color: "#3f4a5e", fontFamily: "'JetBrains Mono',monospace", marginTop: -2, marginBottom: 14, paddingLeft: 2 } },
+        "Source: ",
+        children));
+    const SectionIntro = ({ tag, title, desc, accent }) => (React.createElement("div", { style: {
+            marginBottom: 18, padding: "16px",
+            background: `linear-gradient(160deg, rgba(17,19,24,0.82) 0%, rgba(10,11,15,0.90) 100%)`,
+            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+            borderRadius: 12, border: "1px solid #1e2430", borderLeft: `3px solid ${accent || AC}`,
+            position: "relative", overflow: "hidden", textAlign: "center",
+        } },
+        React.createElement("div", { style: {
+                position: "absolute", top: -20, right: -20, width: 90, height: 90, borderRadius: "50%",
+                background: `radial-gradient(circle, ${accent || AC}1f, transparent 70%)`, pointerEvents: "none",
+            } }),
+        React.createElement("div", { style: {
+                fontFamily: "'Spectral',Georgia,serif", fontSize: 9.5, letterSpacing: "0.16em",
+                textTransform: "uppercase", color: accent || AC, marginBottom: 7, position: "relative",
+            } },
+            "\u25C6 ",
+            tag),
+        React.createElement("div", { style: {
+                fontFamily: "'Spectral',Georgia,serif", fontSize: 21, fontWeight: 900,
+                marginBottom: 5, position: "relative",
+                background: `linear-gradient(135deg,#fff 20%,${accent || AC} 100%)`,
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            } }, title),
+        React.createElement("div", { style: { fontSize: 12.5, color: "#9aa3b5", lineHeight: 1.6, position: "relative", textAlign: "center" } }, desc)));
+    /* ── accordion card shell ── */
+    const DiseaseCard = ({ id, title, icon, color, badges, children, compare }) => {
+        const [open, setOpen] = useState(id === (initialCard || "card-0"));
+        const [hover, setHover] = useState(false);
+        const cardRef = useRef(null);
+        useEffect(() => {
+            if (initialCard && id === initialCard && cardRef.current) {
+                setOpen(true);
+                cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }, [initialCard]);
+        const cc = compare ? "#fbbf24" : (color || AC);
+        return (React.createElement("div", { ref: cardRef, onMouseEnter: () => setHover(true), onMouseLeave: () => setHover(false), style: {
+                background: `linear-gradient(160deg, rgba(17,19,24,0.86) 0%, rgba(12,13,18,0.93) 100%)`,
+                backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+                transform: "translateZ(0)", WebkitTransform: "translateZ(0)",
+                border: `1.5px ${compare ? "dashed" : "solid"} ${compare ? cc + "70" : (open ? cc + "55" : hover ? cc + "33" : "#1e2430")}`,
+                borderRadius: 12, marginBottom: 18, overflow: "hidden", position: "relative",
+                boxShadow: open ? `0 0 0 1px ${cc}1a, 0 10px 28px -10px ${cc}40` : "none",
+                transition: "border-color 0.2s, box-shadow 0.25s",
+            } },
+            React.createElement("div", { style: { position: "absolute", top: 0, right: 0, width: 120, height: 120, pointerEvents: "none",
+                    background: `radial-gradient(circle at top right, ${cc}1a, transparent 65%)` } }),
+            React.createElement("div", { onClick: () => setOpen(!open), style: { padding: "14px 40px 14px 16px", cursor: "pointer", position: "relative", display: "flex", alignItems: "center", gap: 10 } },
+                React.createElement("div", { style: {
+                        width: 36, height: 36, borderRadius: 18, flexShrink: 0,
+                        background: `linear-gradient(135deg, ${cc}33, ${cc}0d)`, border: `1px solid ${cc}40`,
+                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17,
+                        transition: "transform 0.2s", transform: open ? "scale(1.05)" : "scale(1)",
+                    } }, icon || "🌾"),
+                React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                    React.createElement("div", { style: { fontFamily: "'Spectral',Georgia,serif", fontSize: 16, fontWeight: 700, color: "#f0f1f5", marginBottom: badges ? 5 : 0, lineHeight: 1.3, textAlign: "left" } }, title),
+                    badges && badges.length > 0 && (React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } }, badges.map((b, i) => (React.createElement("span", { key: i, style: { padding: "3px 9px", borderRadius: 20, fontWeight: 600,
+                            fontFamily: "'Spectral',Georgia,serif", fontSize: 9.5, letterSpacing: "0.04em",
+                            background: `${b.color || cc}14`, border: `1px solid ${b.color || cc}4d`, color: b.color || cc } }, b.label)))))),
+                React.createElement("div", { style: { position: "absolute", top: 14, right: 14, color: open ? cc : "#5a6478", fontSize: 13,
+                        transform: open ? "rotate(180deg)" : "none", transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1), color 0.2s" } }, "\u25BC")),
+            open && (React.createElement("div", { className: "cvs-tab-content", style: { padding: "0 16px 16px", borderTop: "1px solid #1e2430", paddingTop: 14, position: "relative" } }, children))));
+    };
+    const XLink = ({ topicId, moduleId, tabId, children }) => (React.createElement("button", { onClick: () => onJump && onJump({ topicId, moduleId, tabId }), style: {
+            display: "inline-flex", flexWrap: "wrap", alignItems: "center", gap: 5, maxWidth: "100%",
+            background: `${AC}16`, border: `1px solid ${AC}4a`, borderRadius: 20,
+            padding: "5px 9px", margin: "3px 0", fontSize: "0.83em", fontWeight: 700,
+            color: AC, cursor: "pointer", fontFamily: "inherit", lineHeight: 1.4,
+            whiteSpace: "normal", wordBreak: "break-word", boxShadow: `0 0 8px -3px ${AC}77`,
+        } },
+        "\u2197 ",
+        children));
+    /* ══════════════════════════════ TAB CONTENT ══════════════════════════════ */
+    const content = {
+        mcq: React.createElement(McqQuiz, null),
+        inv: React.createElement("div", null,
+            React.createElement(DiseaseCard, { id: "card-0", title: "Contrast Studies \u2014 Findings", icon: "\uD83E\uDDEA", color: "#38bdf8" },
+                React.createElement(Box, { color: "#38bdf8", title: "Barium swallow (pharynx, oesophagus)" },
+                    KV("Achalasia", "dilated oesophagus tapering to a bird's beak, absent peristalsis, food/fluid level"),
+                    KV("Carcinoma", "irregular shouldered stricture (apple-core), abrupt edges, mucosal destruction"),
+                    KV("Peptic stricture", "smooth, concentric, tapered narrowing, low in the oesophagus"),
+                    KV("Pharyngeal pouch", "posterior outpouching at Killian's dehiscence"),
+                    KV("Hiatus hernia", "gastric folds above the diaphragm; in type III the GOJ stays below"),
+                    KV("Varices / spasm", "serpiginous filling defects / corkscrew or rosary-bead pattern")),
+                React.createElement(Box, { color: "#a78bfa", title: "Barium meal (stomach, duodenum)" },
+                    KV("Benign gastric ulcer", "smooth crater with folds radiating to its edge"),
+                    KV("Malignant ulcer", "irregular heaped margins, clubbed or fused folds, ulcer within a mass"),
+                    KV("Linitis plastica", "rigid, narrow leather-bottle stomach, no peristalsis"),
+                    KV("Outlet obstruction", "dilated stomach, delayed emptying, retained barium"),
+                    KV("Duodenal ulcer", "persistent barium fleck with a deformed bulb"),
+                    KV("Volvulus", "upside-down or twisted stomach, pylorus below the GOJ")),
+                React.createElement(Box, { color: "#34d399", title: "Barium follow-through (small bowel)" },
+                    KV("Crohn's", "string sign in the terminal ileum, cobblestoning, skip lesions, separated loops from wall thickening"),
+                    KV("Tuberculosis", "ileocaecal strictures, gaping ileocaecal valve, contracted caecum"),
+                    KV("Tumour", "filling defect or short stricture with shouldered edges"),
+                    KV("Obstruction", "dilated proximal loops with delayed transit to the transition point")),
+                React.createElement(Box, { color: "#fb923c", title: "Barium enema (colon)" },
+                    KV("Carcinoma", "annular apple-core stricture with shouldered edges"),
+                    KV("Diverticular disease", "saw-tooth muscle thickening with outpouchings"),
+                    KV("Ulcerative colitis", "loss of haustra (lead pipe), collar-stud ulcers, pseudopolyps"),
+                    KV("Sigmoid volvulus", "bird's beak at the twist"),
+                    KV("Avoid", "in toxic megacolon, acute severe colitis or suspected perforation (use water-soluble contrast)"))),
+            React.createElement(DiseaseCard, { id: "card-1", title: "Why Endoscopy Before Contrast", icon: "\uD83D\uDD0D", color: "#38bdf8" },
+                React.createElement(Box, { color: "#38bdf8", title: "Reasons" },
+                    KV("Biopsy", "only endoscopy gives tissue; contrast shows shape, not histology"),
+                    KV("Sensitivity", "better for small, early and mucosal lesions"),
+                    KV("Therapy", "it can dilate, stent, clip or inject in the same sitting"),
+                    KV("Retained barium", "coats the mucosa and obscures later endoscopy"),
+                    KV("Safety", "barium leaking into the mediastinum or peritoneum causes severe inflammation, and aspiration can injure the lungs")),
+                React.createElement(Box, { color: "#fbbf24", title: "When contrast comes first" },
+                    KV("Suspected pharyngeal pouch", "blind endoscopy risks perforating it"),
+                    KV("Suspected perforation", "use water-soluble contrast or CT, not barium"),
+                    KV("Surgical mapping", "to show length or an impassable stricture after endoscopy"))),
+            React.createElement(DiseaseCard, { id: "card-2", title: "Dysphagia: Liquids or Solids First", icon: "\uD83E\uDD64", color: "#38bdf8" },
+                React.createElement(Box, { color: "#f87171", title: "Solids first, then liquids = mechanical narrowing" },
+                    "Solids need a wider lumen than liquids, so they fail first; liquids stick only when the lumen is critically narrow.",
+                    KV("Carcinoma", "rapid progression over weeks or months with weight loss"),
+                    KV("Peptic stricture", "slow, with long reflux history"),
+                    KV("Schatzki ring, web, eosinophilic oesophagitis", "intermittent solid impaction"),
+                    KV("Extrinsic compression", "bronchial cancer, goitre, left atrium or aortic aneurysm")),
+                React.createElement(Box, { color: "#a78bfa", title: "Solids and liquids together from the start = motility disorder" },
+                    "The lumen is open but propulsion or sphincter relaxation fails, so both are affected equally.",
+                    KV("Achalasia", "regurgitation of undigested food, slow progression, young adult"),
+                    KV("Diffuse oesophageal spasm", "intermittent, with chest pain"),
+                    KV("Scleroderma", "with reflux and absent lower oesophageal peristalsis"),
+                    KV("Pseudoachalasia", "older patient, short history, weight loss: exclude GOJ tumour")),
+                React.createElement(Box, { color: "#34d399", title: "Liquids worse, with cough or nasal regurgitation = oropharyngeal" },
+                    "Neuromuscular coordination fails at swallow initiation (stroke, bulbar palsy, myasthenia, Parkinson's), so thin fluids are aspirated more easily than a cohesive bolus.")),
+            React.createElement(DiseaseCard, { id: "card-3", title: "T in TNM: Size vs Depth", icon: "\uD83D\uDCCF", color: "#38bdf8" },
+                React.createElement(Box, { color: "#fbbf24", title: "The rule" },
+                    KV("Solid organs", "T reflects tumour size in cm, with local extension, because there are no wall layers (breast, lung, kidney, liver, pancreas)"),
+                    KV("Hollow organs", "T reflects depth of invasion through the wall layers, because depth predicts nodal spread and resectability (oesophagus, stomach, small bowel, colon, bladder, gallbladder)")),
+                React.createElement(Box, { color: "#38bdf8", title: "Oesophagus and stomach (AJCC 8)" },
+                    KV("T1a", "lamina propria or muscularis mucosae"),
+                    KV("T1b", "submucosa"),
+                    KV("T2", "muscularis propria"),
+                    KV("T3", "oesophagus: adventitia; stomach: subserosa"),
+                    KV("T4a", "oesophagus: pleura, pericardium, azygos vein, diaphragm, peritoneum; stomach: serosa"),
+                    KV("T4b", "adjacent structures, e.g. aorta, vertebra, trachea"),
+                    "Endoscopic ultrasound resolves the wall layers, which is why it is the best tool for T staging in hollow organs."))),
+        /* ═══════════════════ TAB 1 — SURGICAL ANATOMY ═══════════════════ */
+        anatomy: (React.createElement("div", null,
+            React.createElement(SectionIntro, { tag: "Foregut, Midgut & Hindgut", title: "Surgical Anatomy of the GI Tract", accent: "#22c55e", desc: "Almost every rule in this chapter \u2014 which vessel bleeds, where a watershed infarct occurs, which lymph nodes to clear, which structures are retroperitoneal and therefore silent on plain film \u2014 traces back to this one embryological map." }),
+            React.createElement(DiseaseCard, { id: "card-0", title: "Divisions & Landmarks", icon: "\uD83D\uDDFA\uFE0F", color: "#22c55e" },
+                React.createElement(Box, { color: "#22c55e", title: "Overview" }, "Roughly 25 cm long, spanning from the cricopharyngeus (C6) to the gastro-esophageal junction (T11), passing through the diaphragm at the esophageal hiatus (T10)."),
+                React.createElement(H, { color: "#22c55e" }, "Upper GI Tract"),
+                React.createElement(Row, { c: "#22c55e", label: "Three natural narrowings", val: "The cricopharyngeal sphincter, the point where the aortic arch and left main bronchus cross the esophagus, and the diaphragmatic hiatus \u2014 these are the classic sites for food bolus impaction, foreign body lodgement, and corrosive injury to concentrate, since transit briefly slows at each." }),
+                React.createElement(Row, { c: "#22c55e", label: "Stomach \u2014 regions", val: "Cardia (adjoining the GOJ), fundus (superior dome, typically containing a gastric air bubble visible on plain film), body, antrum, and pylorus \u2014 the antrum and pylorus are the site of most peptic ulcers and the classic site of gastric outlet obstruction covered on the Esophagus/Stomach tab." }),
+                React.createElement(Row, { c: "#22c55e", label: "Stomach \u2014 curvatures and omental attachments", val: "The lesser curvature gives attachment to the lesser omentum (running to the liver, containing the portal triad at its free right edge \u2014 the structures clamped during a Pringle manoeuvre), while the greater curvature gives attachment to the greater omentum, which drapes down over the transverse colon and small bowel and has a genuine protective function, migrating to wall off intra-abdominal inflammation." }),
+                React.createElement(Row, { c: "#22c55e", label: "Duodenum \u2014 four parts", val: "Forms a C-shape around the head of pancreas. First (superior) part: intraperitoneal, the site of most duodenal peptic ulcers, adjacent to the gastroduodenal artery (relevant to posterior ulcer bleeding, covered on the Esophagus/Stomach tab). Second (descending) part: contains the major duodenal papilla/ampulla of Vater, where the common bile duct and main pancreatic duct converge \u2014 a landmark shared with the Pancreas and Gallbladder & Bile Ducts chapters. Third (horizontal) part: crosses anterior to the aorta and IVC, posterior to the superior mesenteric vessels \u2014 the site of the (rare) superior mesenteric artery syndrome, where these vessels compress the duodenum in severe weight loss. Fourth (ascending) part: ends at the duodenojejunal flexure, fixed by the ligament of Treitz, the standard landmark separating 'upper' from 'lower' GI bleeding on endoscopic/anatomical convention." }),
+                React.createElement(Ref, null, "Standard surgical anatomy (Bailey & Love); Gray's Anatomy.")),
+            React.createElement(DiseaseCard, { id: "card-2", title: "Blood Supply", icon: "\uD83E\uDE78", color: "#22c55e" },
+                React.createElement(Box, { color: "#22c55e", title: "Overview" }, "Supplies the GI tract from the lower esophagus to the second part of the duodenum, plus the liver, spleen, and pancreas via its three branches \u2014 left gastric, splenic, and common hepatic."),
+                React.createElement(SubHead, { color: "#22c55e", icon: "\uD83E\uDE78" }, "The Three Gut Divisions & Their Named Arteries"),
+                React.createElement(Row, { label: "Foregut (celiac trunk)", val: "This embryological boundary at the mid-second part of the duodenum is precisely why the celiac trunk's territory never needs to communicate with the next segment's vessel under normal circumstances." }),
+                React.createElement(Row, { c: "#22c55e", label: "Midgut (superior mesenteric artery)", val: "Supplies from the second part of the duodenum through to the proximal two-thirds of the transverse colon \u2014 the vessel of concern in acute mesenteric ischaemia presenting with pain out of proportion to examination findings; SMA embolism classically spares the proximal jejunum (fed by the first jejunal branches arising before the typical embolus lodges further down the vessel) while devastating the mid-small bowel." }),
+                React.createElement(Row, { c: "#22c55e", label: "Hindgut (inferior mesenteric artery)", val: "Supplies from the distal third of the transverse colon through the rectum to just above the dentate line, where hindgut blood supply hands over to the somatic vessels of the anal canal below the line." }),
+                React.createElement(SubHead, { color: "#22c55e", icon: "\u26A0\uFE0F" }, "Watershed Zones \u2014 Why Ischaemic Colitis Has a Predictable Location"),
+                React.createElement(Row, { c: "#22c55e", label: "Splenic flexure (Griffith's point)", val: "The junction between SMA and IMA territory, where collateral flow via the marginal artery of Drummond is often anatomically poorest \u2014 the single most common site for ischaemic colitis in a low-flow state, since it is furthest from robust dual supply." }),
+                React.createElement(Row, { c: "#22c55e", label: "Rectosigmoid junction (Sudeck's point)", val: "The junction between the sigmoidal branches of the IMA and the superior rectal artery, similarly a relative watershed with variable collateral supply, and the second classic site for ischaemic colitis." }),
+                React.createElement(Row, { c: "#22c55e", label: "The marginal artery of Drummond", val: "A continuous anastomotic arcade running along the mesenteric border of the entire colon, linking SMA and IMA branches \u2014 its collateral capacity is what usually prevents ischaemia when one major vessel is gradually occluded (e.g. chronic mesenteric atherosclerosis), but this same collateral network is precisely what is anatomically weakest at the two watershed points above, which is why acute low-flow ischaemia localises there rather than diffusely." }),
+                React.createElement(Tip, null, "Any question describing 'thumbprinting' on abdominal X-ray or CT with pain localised to the left iliac fossa in a patient with a recent episode of hypotension, arrhythmia, or sepsis is describing ischaemic colitis at one of these two watershed points \u2014 the anatomy alone should let you predict the location before the imaging is even described."),
+                React.createElement(Ref, null, "Standard surgical anatomy (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-3", title: "Peritoneal Relations", icon: "\uD83E\uDDED", color: "#22c55e" },
+                React.createElement(Box, { color: "#22c55e", title: "Overview" }, "Retroperitoneal structures are relatively fixed, poorly mobile, and their injury or disease can be radiologically and clinically silent for longer than an intraperitoneal equivalent, since blood or gas tracking."),
+                React.createElement(Row, { label: "Why intraperitoneal vs retroperitoneal matters clinically", val: "Retroperitoneally does not immediately produce the generalised peritonism an intraperitoneal leak would." }),
+                React.createElement(Mnem, { title: "'SAD PUCKER' \u2014 Retroperitoneal Structures", items: [
+                        "S — Suprarenal (adrenal) glands",
+                        "A — Aorta/IVC",
+                        "D — Duodenum (2nd–4th parts)",
+                        "P — Pancreas (except the tail, which is intraperitoneal within the splenorenal ligament)",
+                        "U — Ureters",
+                        "C — Colon (ascending and descending only — transverse and sigmoid are intraperitoneal)",
+                        "K — Kidneys",
+                        "E — (o)Esophagus (thoracic part)",
+                        "R — Rectum (lower two-thirds)",
+                    ] }),
+                React.createElement(Row, { c: "#22c55e", label: "Hiatus hernia \u2014 a direct anatomical consequence", val: "Widening of the esophageal hiatus allows the gastro-esophageal junction (sliding, type I \u2014 the great majority) or the gastric fundus alongside a normally positioned GOJ (rolling/paraesophageal, type II, or mixed types III/IV) to migrate into the thorax \u2014 sliding hiatus hernia is the anatomical substrate for much of the reflux-driven peptic stricture and Barrett's disease covered on the Esophagus/Stomach tab, while paraesophageal hernias carry a distinct risk of gastric volvulus, also covered there." }),
+                React.createElement(Row, { c: "#22c55e", label: "Hepatoduodenal ligament and the Pringle manoeuvre", val: "The free right edge of the lesser omentum, containing the portal triad (portal vein, hepatic artery, common bile duct) \u2014 surgically compressible between finger and thumb (the Pringle manoeuvre) to control inflow bleeding during liver surgery or trauma, an anatomical shortcut only possible because these three structures travel together in one accessible, compressible bundle." }),
+                React.createElement(Row, { c: "#22c55e", label: "Appendix position variants", val: "The base of the appendix is constant (at the confluence of the taeniae coli on the cecum), but the tip can lie retrocecal (most common, and the position most likely to produce atypical pain and a positive psoas sign given proximity to that muscle), pelvic (irritating obturator internus, hence the obturator sign), or pre/post-ileal \u2014 this anatomical variability is precisely why appendicitis has such a variable clinical presentation despite a single, constant underlying pathophysiology." }),
+                React.createElement(Ref, null, "Standard surgical anatomy (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-4", title: "Structures at Risk", icon: "\uD83C\uDFAF", color: "#22c55e" },
+                React.createElement(Box, { color: "#22c55e", title: "Overview" }, "Both ureters run retroperitoneally and cross close to the operative field during colorectal mobilisation \u2014 the left ureter passes near the origin of the inferior mesenteric artery and is at particular risk during high."),
+                React.createElement(Table, { color: "#22c55e", headers: ["Structure", "Operative danger"], rows: [
+                        ["The ureter — the single most feared structure in colorectal surgery", "At risk during ligation of the IMA in left-sided/rectal resections, and wherever both ureters cross anterior to the common iliac vessels near the pelvic brim — deliberately identifying and tracing the ureter before dividing major vascular pedicles nearby is standard practice, since ureteric injury can be entirely asymptomatic intraoperatively and only declare itself days later as a urinoma, fistula, or unexplained rising creatinine"],
+                        ["The spleen — an innocent bystander in colonic surgery", "Splenic flexure mobilisation requires dividing the splenocolic ligament immediately adjacent to the spleen's lower pole — excessive traction can avulse the splenic capsule, turning a straightforward colonic resection into an unplanned splenectomy"],
+                        ["The duodenum and pancreas during right-sided colonic surgery", "Mobilising the hepatic flexure and right colon brings dissection close to the second/third part of duodenum and the head of pancreas — a Kocher manoeuvre is sometimes deliberately performed to improve access; an unrecognised injury classically presents late as a postoperative duodenal leak/fistula"],
+                        ["The ampulla of Vater and biliary/pancreatic ducts during duodenal surgery", "Any surgery around the duodenum's second part risks the common bile duct and main pancreatic duct where they converge at the major duodenal papilla — approached with specific preoperative imaging or intraoperative identification of the ampulla"],
+                        ["The marginal artery of Drummond during any bowel resection", "Ligating vessels too close to the bowel wall, or over-aggressively skeletonising the mesentery at the anastomotic site, can compromise the marginal arcade's contribution to that segment's blood supply — contributing directly to anastomotic ischaemia and leak"],
+                    ] }),
+                React.createElement(Tip, null, "A useful way to hold all of these together: every one of these 'structures at risk' sits either retroperitoneally (ureter, duodenum, pancreas) where it is easy to forget because it is not immediately visible in the operative field, or immediately adjacent to the dissection plane (spleen, marginal artery, ampulla) where it is easy to injure through simple proximity \u2014 deliberately naming and checking for each of these before dividing tissue in its vicinity is the practical translation of 'know your anatomy' into a genuine safety habit."),
+                React.createElement(Ref, null, "Standard surgical anatomy and operative teaching (Bailey & Love).")))),
+        /* ═══════════════════ TAB 2 — ESOPHAGUS & STOMACH ═══════════════════ */
+        upperGI: (React.createElement("div", null,
+            React.createElement(SectionIntro, { tag: "Obstruction, Ulcers & Tumors", title: "Esophageal & Gastric Surgery", accent: "#0ea5e9", desc: "Upper GI surgical disease sits at the intersection of two very different problems \u2014 mechanical obstruction of a tube, and mucosal disease of a secretory organ \u2014 and the two frequently converge, since a chronic ulcer can obstruct and an obstructing tumour can ulcerate." }),
+            React.createElement(DiseaseCard, { id: "card-0", title: "Benign Obstruction", icon: "\uD83D\uDD34", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Chronic gastro-esophageal reflux (often on a background of sliding hiatus hernia, see Anatomy tab) causes recurrent mucosal injury and fibrotic healing at the lower esophagus, progressively narrowing the lumen."),
+                React.createElement(Row, { label: "Peptic stricture", val: "Presents with gradually progressive dysphagia, first to solids then liquids, typically in a patient with a long reflux history; managed with endoscopic dilatation and aggressive acid suppression (high-dose proton pump inhibitor) to prevent recurrence, since the stricture will simply re-form if the underlying reflux continues unchecked." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Corrosive stricture", val: "Ingestion of a strong acid or alkali (accidental in children, deliberate in adults) causes acute mucosal necrosis followed by fibrotic stricturing as it heals, often at the natural anatomical narrowings covered on the Anatomy tab \u2014 alkali injury tends to cause deeper liquefactive necrosis than acid injury, which produces a more protective, though still damaging, coagulative eschar; acute management prioritises avoiding induced vomiting (which re-exposes the esophagus to the corrosive on the way back up) and early, cautious endoscopy to grade injury severity, since long-term stricture formation and a markedly increased risk of subsequent esophageal squamous cell carcinoma are both recognised sequelae, sometimes decades later." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Achalasia", val: "Failure of lower esophageal sphincter relaxation combined with loss of normal peristalsis, due to degeneration of inhibitory ganglion cells in the myenteric (Auerbach's) plexus \u2014 the cause of this degeneration is usually idiopathic, though Chagas disease (Trypanosoma cruzi infection destroying the same plexus) produces an identical picture and should be considered in the relevant travel/exposure context. Produces a 'bird's beak' tapering of the distal esophagus on barium swallow with proximal dilatation, and manometry showing absent peristalsis with incomplete LES relaxation confirms the diagnosis. Managed with pneumatic dilatation, surgical Heller's cardiomyotomy (often combined with a partial fundoplication to reduce subsequent reflux), or peroral endoscopic myotomy (POEM) \u2014 all mechanically overcoming the non-relaxing sphincter, since the underlying loss of peristalsis itself cannot be pharmacologically or surgically reversed." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Extrinsic compression and foreign body", val: "Mediastinal masses, an enlarged left atrium (in severe mitral stenosis), or a vascular anomaly (aberrant right subclavian artery \u2014 dysphagia lusoria) can compress the esophagus externally, while food bolus or true foreign body impaction lodges preferentially at the three natural narrowings \u2014 a food bolus impaction with no prior dysphagia history should itself prompt investigation for an underlying stricture or eosinophilic esophagitis once the acute bolus is cleared." }),
+                React.createElement(Ref, null, "Standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-1", title: "Oesophageal Cancer", icon: "\uD83C\uDF97\uFE0F", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Classically affects the upper and middle esophagus, strongly associated with smoking and alcohol (synergistic risk when combined, rather than simply additive), and remains the dominant esophageal cancer subtype."),
+                React.createElement(H, { color: "#0ea5e9" }, "Two Distinct Subtypes"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Squamous cell carcinoma", val: "Worldwide, particularly outside high-income countries \u2014 also the subtype linked to corrosive stricture (above) and achalasia, both of which cause chronic mucosal irritation of native squamous epithelium." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Adenocarcinoma", val: "Classically affects the lower esophagus and gastro-esophageal junction, arising through the Barrett's esophagus sequence, and is now the more common esophageal cancer subtype in many Western populations, reflecting the rising prevalence of obesity and reflux disease." }),
+                React.createElement(H, { color: "#0ea5e9" }, "Barrett's Esophagus & Surveillance"),
+                React.createElement(Row, { c: "#0ea5e9", label: "The metaplasia-dysplasia-carcinoma sequence", val: "Chronic reflux causes metaplastic replacement of normal squamous epithelium with columnar, intestinal-type epithelium (Barrett's esophagus) \u2014 this then progresses through low-grade dysplasia, high-grade dysplasia, and finally invasive adenocarcinoma in a minority of cases over years, and it is this entire sequence that population-level and case-level endoscopic surveillance is designed to interrupt." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Surveillance and management by dysplasia grade", val: "Barrett's without dysplasia is managed with interval surveillance endoscopy and biopsy (interval determined by segment length); low-grade dysplasia surveillance intervals shorten, or endoscopic ablation (radiofrequency ablation) may be offered; high-grade dysplasia or early (intramucosal) carcinoma is generally managed with endoscopic resection or ablation rather than immediately proceeding to major esophagectomy, reflecting the low risk of nodal spread while disease remains confined to the mucosa." }),
+                React.createElement(H, { color: "#0ea5e9" }, "Staging Work-Up \u2014 In Sequence"),
+                React.createElement(PillarCard, { n: 1, total: 5, color: "#0ea5e9", icon: "\uD83D\uDD2C", title: "Endoscopy with biopsy", body: "Confirms the histological diagnosis." }),
+                React.createElement(PillarCard, { n: 2, total: 5, color: "#0ea5e9", icon: "\uD83D\uDCE1", title: "Endoscopic ultrasound (EUS)", body: "Assesses depth of wall invasion (T stage) and adjacent nodal involvement with greater local accuracy than cross-sectional imaging." }),
+                React.createElement(PillarCard, { n: 3, total: 5, color: "#0ea5e9", icon: "\uD83D\uDDA5\uFE0F", title: "CT chest/abdomen/pelvis", body: "Screens for distant metastatic disease." }),
+                React.createElement(PillarCard, { n: 4, total: 5, color: "#0ea5e9", icon: "\uD83C\uDFAF", title: "PET-CT", body: "Adds functional information and can detect otherwise occult distant disease that would change management from curative to palliative intent." }),
+                React.createElement(PillarCard, { n: 5, total: 5, color: "#0ea5e9", icon: "\uD83D\uDD0E", title: "Staging laparoscopy \u2014 for GOJ/lower esophageal tumours with a gastric component", body: "Detects small-volume peritoneal metastases that even PET-CT can miss, since finding these would avoid an unnecessary major resection." }),
+                React.createElement(H, { color: "#0ea5e9" }, "Management Principles"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Curative intent", val: "Oesophagectomy, generally combined with neoadjuvant chemotherapy or chemoradiotherapy for locally advanced but resectable disease, in fit patients without distant metastasis \u2014 surgery is a major undertaking (transthoracic or transhiatal approaches, with the stomach most commonly used as the conduit to restore continuity) carrying meaningful morbidity and mortality even in specialist centres, which is why fitness assessment and staging accuracy both matter enormously before committing to this pathway." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Palliative intent", val: "Endoscopic dilatation and self-expanding metal stents provide relief of dysphagia for malignant obstruction in patients unfit for or beyond curative treatment; palliative chemotherapy/radiotherapy may also be used to slow progression and control symptoms without curative aim." }),
+                React.createElement(Warn, { title: "Red flag" }, "Progressive dysphagia, particularly with weight loss, in a patient over 55 meets criteria for urgent (two-week-wait equivalent) upper GI endoscopy to exclude malignancy, and should never be assumed to be a simple peptic stricture without direct visualisation and biopsy."),
+                React.createElement(Ref, null, "NICE NG12/NG83; standard surgical/oncology teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-1b", title: "Motility & Dysphagia Work-up", icon: "\uD83D\uDCC8", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Uncoordinated or excessively forceful esophageal contractions without the complete aperistalsis of achalasia \u2014 produces the classic 'corkscrew' or 'rosary bead' appearance on barium swallow from simultaneous."),
+                React.createElement(H, { color: "#0ea5e9" }, "Motility Disorders Beyond Achalasia"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Diffuse esophageal spasm (and jackhammer esophagus)", val: "Non-propagating contractions, and can present with intermittent dysphagia and chest pain severe enough to be mistaken for cardiac ischaemia, making cardiac causes an essential exclusion before attributing chest pain to an oesophageal motility disorder; manometry (showing simultaneous, high-amplitude, or premature contractions depending on the specific subtype) confirms the diagnosis where barium findings are equivocal." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Scleroderma (systemic sclerosis) oesophagus", val: "Progressive replacement of the smooth muscle in the distal two-thirds of the oesophagus with fibrous tissue produces weak or absent peristalsis there, while the proximal, striated-muscle third (under different neuromuscular control) is relatively spared \u2014 combined with a low, incompetent lower oesophageal sphincter pressure, this produces severe reflux disease and an oesophagus that empties poorly by gravity alone, a distinctive combination that should prompt consideration of underlying systemic sclerosis, particularly alongside other suggestive features (Raynaud's, skin changes, sclerodactyly)." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83E\uDDED" }, "A Structured Approach to Dysphagia"),
+                React.createElement(Table, { color: "#0ea5e9", headers: ["Branch point", "What it tells you"], rows: [
+                        ["Oropharyngeal vs oesophageal localisation", "Oropharyngeal dysphagia (difficulty initiating a swallow, coughing or choking immediately on swallowing, nasal regurgitation) points toward a neurological or structural problem at the pharyngeal level (stroke, myasthenia, pharyngeal pouch). Oesophageal dysphagia (food sticking after an apparently normal swallow has been initiated) points toward a problem further down the tract"],
+                        ["Solid-only vs solid-and-liquid dysphagia", "Solids only, particularly if progressive, points toward a mechanical/structural cause (stricture, tumour, ring), since a food bolus of sufficient size is needed to trigger symptoms. Both solids and liquids from the outset points toward a motility disorder (achalasia or the conditions above), since these affect coordinated muscular passage regardless of consistency"],
+                    ] }),
+                React.createElement(Tip, null, "These two branch points, obtainable from history alone, are often enough to direct the first investigation \u2014 endoscopy for suspected structural disease, or barium swallow/manometry for suspected motility disease \u2014 before any test is performed."),
+                React.createElement(Ref, null, "Standard surgical/gastroenterology teaching (Bailey & Love; Kumar & Clark).")),
+            React.createElement(DiseaseCard, { id: "card-2", title: "PUD \u2014 Aetiology & Diagnosis", icon: "\uD83D\uDD73\uFE0F", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Accounts for the majority of peptic ulcers overall, colonising the gastric antral mucosa and disrupting the normal mucus-bicarbonate protective barrier while also driving chronic gastritis \u2014 duodenal ulcers are more."),
+                React.createElement(Row, { label: "H. pylori", val: "Strongly H. pylori-associated than gastric ulcers, and eradication therapy (a proton pump inhibitor plus two antibiotics, typically amoxicillin and clarithromycin, or metronidazole in penicillin allergy) both heals the ulcer and dramatically reduces recurrence compared with acid suppression alone." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "NSAIDs", val: "Reduce mucosal defence by inhibiting COX-1-mediated protective prostaglandin synthesis (which normally stimulates mucus and bicarbonate secretion and maintains mucosal blood flow) \u2014 risk rises with dose, duration, concurrent corticosteroid or anticoagulant use, and age, and co-prescription of a proton pump inhibitor is standard practice when NSAIDs cannot be avoided in at-risk patients." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Zollinger-Ellison syndrome", val: "A gastrin-secreting neuroendocrine tumour (gastrinoma), most often in the duodenum or pancreas, drives extreme, unregulated gastric acid hypersecretion \u2014 should be suspected with multiple, recurrent, or unusually distal (post-bulbar/jejunal) ulcers, ulcers resistant to standard therapy, or associated diarrhoea (from acid-mediated inactivation of pancreatic enzymes and direct mucosal injury); a fasting serum gastrin level (off proton pump inhibitors, which themselves raise gastrin) is the key screening test, and roughly a quarter of cases occur as part of MEN1 syndrome alongside parathyroid and pituitary tumours." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Duodenal vs gastric ulcer \u2014 a clinically useful distinction", val: "Duodenal ulcer pain classically improves with eating (food buffers acid reaching the already-healed duodenal mucosa) and recurs a few hours later as the stomach empties; gastric ulcer pain classically worsens with eating (food stimulates acid secretion against an already-compromised gastric mucosal barrier) \u2014 this distinction is a useful clinical heuristic though it is not reliable enough alone to avoid endoscopic confirmation." }),
+                React.createElement(Ref, null, "Standard surgical/gastroenterology teaching (Bailey & Love; Kumar & Clark).")),
+            React.createElement(DiseaseCard, { id: "card-3", title: "PUD \u2014 Complications & Surgery", icon: "\uD83D\uDEA8", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "A duodenal (more common) or gastric ulcer erodes fully through the wall, spilling gastric content into the peritoneal cavity and producing sudden, severe abdominal pain rapidly becoming generalised, with a rigid."),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83D\uDCA5" }, "Perforation"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Presentation and confirmation", val: "Board-like abdomen \u2014 an erect chest X-ray showing free sub-diaphragmatic air confirms the diagnosis in the majority of cases, though a normal film does not exclude it, and CT is more sensitive if the diagnosis remains uncertain." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Management", val: "Resuscitation (IV fluids, broad-spectrum antibiotics, analgesia, nasogastric decompression) proceeds in parallel with urgent surgical assessment; surgical repair is most often an omental (Graham) patch over the perforation rather than formal ulcer resection in the acute setting, since the priority is source control in a physiologically stressed patient rather than definitive ulcer surgery, which can be addressed medically (H. pylori eradication, acid suppression) once the patient has recovered." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83E\uDE78" }, "Bleeding"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Mechanism", val: "Erosion into an underlying vessel \u2014 a posterior duodenal ulcer eroding into the gastroduodenal artery is the classical, most dangerous example given the volume of bleeding that vessel can produce \u2014 presents with haematemesis and/or melaena, or, if bleeding is brisk enough, haematochezia despite an upper GI source." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Risk stratification", val: "The Glasgow-Blatchford score, calculated from clinical and simple laboratory data (urea, haemoglobin, systolic BP, pulse, and the presence of melaena/syncope/hepatic disease/cardiac failure) before endoscopy, identifies patients at very low risk who may be safely managed as outpatients without admission; the Rockall score, incorporating endoscopic findings alongside clinical data, stratifies risk of rebleeding and mortality after endoscopy and guides the intensity of post-endoscopic monitoring." }),
+                React.createElement(PillarCard, { n: 1, total: 3, color: "#0ea5e9", icon: "\uD83E\uDE79", title: "Endoscopic haemostasis \u2014 first line", body: "Adrenaline injection, thermal coagulation, and/or clipping, generally combining at least two modalities for high-risk stigmata." }),
+                React.createElement(PillarCard, { n: 2, total: 3, color: "#0ea5e9", icon: "\uD83D\uDC8A", title: "Proton pump inhibitor therapy", body: "Reduces rebleeding risk by raising intragastric pH to stabilise clot." }),
+                React.createElement(PillarCard, { n: 3, total: 3, color: "#0ea5e9", icon: "\uD83D\uDD2A", title: "Surgery or interventional radiology \u2014 for endoscopic failure", body: "Under-running/ligating the bleeding vessel, or rarely gastrectomy, or embolisation \u2014 reserved for endoscopic failure, rebleeding after initial successful endoscopy, or haemodynamic instability precluding safe endoscopy." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83D\uDEA7" }, "Gastric Outlet Obstruction (Acquired Pyloric Stenosis)"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Mechanism and presentation", val: "Chronic scarring and oedema from recurrent peptic ulceration at the pylorus or duodenal cap narrows the outlet, producing early satiety and non-bilious, projectile vomiting of previously ingested, sometimes days-old food (a useful discriminator from more proximal causes of vomiting) \u2014 a succussion splash on examination reflects retained gastric fluid and air." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Metabolic consequence", val: "Loss of gastric acid (hydrochloric acid) through vomiting, combined with renal compensation, produces a hypochloraemic, hypokalaemic metabolic alkalosis \u2014 the kidney initially tries to conserve sodium at the expense of hydrogen ion excretion (paradoxical aciduria) once potassium stores are depleted, a classically tested acid-base picture distinct from congenital pyloric stenosis of infancy despite the identical metabolic derangement and shared name." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Management", val: "Correction of fluid and electrolyte derangement (0.9% saline with potassium replacement) precedes any intervention; endoscopic balloon dilatation is first line for benign strictures, with surgery (gastrojejunostomy, or resection if malignancy cannot be excluded) reserved for dilatation failure or recurrent obstruction." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83C\uDF97\uFE0F" }, "Malignant Transformation"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Relevant specifically to gastric ulcers", val: "Duodenal ulcers essentially never transform to malignancy, but any gastric ulcer identified on endoscopy requires biopsy of the ulcer edge (multiple quadrants) and follow-up endoscopy to confirm complete healing \u2014 an ulcer that fails to heal on repeat endoscopy despite adequate acid suppression should be re-biopsied and regarded as malignant until proven otherwise." }),
+                React.createElement(Ref, null, "Glasgow-Blatchford and Rockall scores; standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-3b", title: "PUD \u2014 Medical Therapy", icon: "\uD83D\uDC8A", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Irreversibly inhibit the H+/K+-ATPase ('proton pump') on the gastric parietal cell, the final common step of acid secretion regardless of what stimulated it (histamine, gastrin, or vagal/acetylcholine input)."),
+                React.createElement(H, { color: "#0ea5e9" }, "Acid Suppression"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Proton pump inhibitors (PPIs)", val: "This is why PPIs achieve more complete and reliable acid suppression than the older H2-receptor antagonists, which block only the histamine-mediated pathway and leave gastrin- and vagally-driven secretion relatively intact." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "H2-receptor antagonists", val: "Now used less often than PPIs given their less complete acid suppression, though they retain a role where PPI therapy is contraindicated or not tolerated, and are sometimes used for step-down maintenance therapy once an ulcer has healed." }),
+                React.createElement(H, { color: "#0ea5e9" }, "H. pylori Eradication Regimens"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Standard triple therapy", val: "A PPI combined with two antibiotics (typically amoxicillin and clarithromycin, or metronidazole substituted for amoxicillin in penicillin allergy) for a defined course, generally 7\u201314 days \u2014 rising clarithromycin resistance in some populations has reduced first-line eradication success rates with this regimen, prompting increasing use of quadruple therapy in areas of higher resistance." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Quadruple therapy", val: "Adds bismuth to a PPI and two antibiotics (or uses a non-bismuth 'concomitant' four-drug combination), used either as first-line therapy in areas of known high clarithromycin resistance or as second-line rescue therapy after a failed initial eradication attempt." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Confirming eradication", val: "A urea breath test or stool antigen test, performed at least four weeks after completing antibiotic therapy and after stopping PPI therapy for one to two weeks beforehand (both antibiotics and PPIs can suppress H. pylori enough to produce a false-negative test without truly eradicating it), confirms successful eradication \u2014 serology (antibody testing) is not used to confirm cure, since antibodies typically remain positive for months to years after successful eradication and would incorrectly suggest ongoing infection." }),
+                React.createElement(H, { color: "#0ea5e9" }, "The Refractory Ulcer"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Working through the differential", val: "An ulcer failing to heal despite apparently adequate therapy should prompt a systematic review: confirming genuine treatment adherence (the single most common reason for apparent 'refractoriness'), confirming H. pylori has actually been eradicated (rather than assumed cured without a confirmatory test), checking for continued covert NSAID or aspirin use (including over-the-counter formulations the patient may not think to mention), reconsidering Zollinger-Ellison syndrome if not already excluded, and re-biopsying the ulcer edge to exclude an underlying malignancy that has been treated as a benign ulcer throughout." }),
+                React.createElement(Ref, null, "Standard gastroenterology teaching (Kumar & Clark).")),
+            React.createElement(DiseaseCard, { id: "card-4", title: "Gastric Volvulus", icon: "\uD83C\uDF00", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "The stomach rotates around its own long (cardio-pyloric) axis \u2014 the more common type, frequently associated with a large paraesophageal (rolling/type II) hiatus hernia (see Anatomy tab) that allows the stomach to migrate and twist within the chest."),
+                React.createElement(Row, { c: "#0ea5e9", label: "Mesenteroaxial volvulus", val: "Rotation around an axis perpendicular to the long axis (roughly gastro-hepatic to gastro-colic) \u2014 less common, and more prone to vascular compromise given the more acute angle of twist relative to the vessels supplying the stomach." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Borchardt's triad", val: "Severe epigastric pain, retching with an inability to vomit, and inability to pass a nasogastric tube \u2014 together strongly suggestive of acute gastric volvulus and an indication for emergency surgical detorsion and gastropexy (or repair of the underlying diaphragmatic defect) before ischaemia and perforation supervene." }),
+                React.createElement(Warn, { title: "Do not delay" }, "Borchardt's triad in a patient with a known large hiatus hernia should prompt urgent surgical referral rather than repeated attempts at nasogastric decompression, since the inability to pass the tube is itself part of the diagnostic picture, not simply a technical failure to persist with."),
+                React.createElement(Ref, null, "Standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-5", title: "Gastric Perforation", icon: "\uD83D\uDCA5", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Peptic ulcer disease, covered above, remains by far the most common cause of gastric (and duodenal) perforation; malignant ulcers, ingested foreign bodies, and, rarely, corrosive injury are less common alternative."),
+                React.createElement(Row, { label: "Most common cause", val: "Causes that should be considered particularly when the perforation site or surrounding tissue looks atypical at surgery." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Presentation and initial management", val: "Sudden severe epigastric pain rapidly becoming generalised, a rigid ('board-like') abdomen, and systemic signs of sepsis as peritonitis develops \u2014 resuscitation with IV fluids, broad-spectrum antibiotics, and analgesia proceed in parallel with urgent surgical assessment, and an erect chest X-ray or CT confirming free air supports but is not mandatory before proceeding to laparotomy/laparoscopy in a clinically clear case of perforation." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Intraoperative principle", val: "At surgery, the perforation is repaired (typically with an omental patch) and a biopsy of the ulcer edge is taken specifically to exclude malignancy, since a perforated malignant gastric ulcer changes both the immediate operative decision-making and the entire subsequent oncological management pathway." }),
+                React.createElement(Ref, null, "Standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-5b", title: "Imaging & Boerhaave Distinction", icon: "\uD83D\uDD2C", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "CT is now generally preferred over barium studies for confirming gastric volvulus in the acute setting, since it is faster to obtain in an unwell patient and can simultaneously assess for complications \u2014 a 'whirl sign'."),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83C\uDF00" }, "Imaging Clarification for Volvulus"),
+                React.createElement(Row, { c: "#0ea5e9", label: "CT signs", val: "From twisted mesenteric vessels and an abnormally oriented, often markedly distended stomach with the greater curvature lying superior to the lesser curvature (in organoaxial volvulus) or a transposed antrum and fundus (in mesenteroaxial volvulus) are the key distinguishing radiological features between the two subtypes described on the main Gastric Volvulus card." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83E\uDE79" }, "Cameron Lesions \u2014 a Related but Distinct Entity"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Mechanism and relevance", val: "Linear erosions or ulcers occurring at the diaphragmatic hiatus in a patient with a large hiatus hernia, caused by mechanical trauma and localised ischaemia as the herniated stomach repeatedly moves across the diaphragmatic pinch point with respiration \u2014 a recognised, sometimes overlooked cause of chronic occult or overt GI bleeding and iron deficiency anaemia in patients with a large hiatus hernia, distinct from the acute, mechanical volvulus/perforation emergencies covered on the main cards but arising from the same underlying anatomical substrate (a large hiatus hernia, see the Anatomy tab)." }),
+                React.createElement(SubHead, { color: "#ff4d6d", icon: "\u2696\uFE0F" }, "Boerhaave Syndrome \u2014 the Critical Perforation Differential"),
+                React.createElement(Table, { color: "#ff4d6d", headers: ["Feature", "Gastric Perforation", "Boerhaave Syndrome"], rows: [
+                        ["What ruptures", "Stomach wall — overwhelmingly due to peptic ulcer disease eroding through the gastric wall", "Full-thickness rupture of the oesophagus itself (not the stomach), classically at the left posterolateral distal oesophagus"],
+                        ["Mechanism", "Ulcer erosion through the wall", "Sudden rise in intraoesophageal pressure against a closed glottis — most classically during forceful vomiting"],
+                        ["Presentation", "Board-like abdomen, sudden severe abdominal pain", "Severe chest/epigastric pain following a vomiting episode, sometimes with subcutaneous emphysema in the neck (Mackler's triad: vomiting, chest pain, subcutaneous emphysema — full triad present in only a minority); frequently misdiagnosed initially as a cardiac event, pancreatitis, or simple gastric perforation"],
+                        ["Why the distinction changes management", "Managed with a laparotomy/laparoscopy and abdominal source control (typically an omental patch)", "Requires thoracic surgical input and mediastinal/pleural source control — mediastinal contamination is tolerated far less well than intraperitoneal contamination, and Boerhaave carries disproportionately high mortality if this diagnostic delay isn't caught"],
+                    ] }),
+                React.createElement(Warn, { title: "Why the distinction changes management" }, "Mistaking one for the other, or simply assuming any 'perforation' after vomiting is gastric, sends the patient to the wrong operative approach and delays the mediastinal washout that outcome in Boerhaave syndrome specifically depends on."),
+                React.createElement(Ref, null, "Standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-5c", title: "Paraoesophageal Hernia", icon: "\u2696\uFE0F", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Earlier surgical teaching held that any large (type II\u2013IV) paraesophageal hiatus hernia should be electively repaired once diagnosed, regardless of symptoms, on the reasoning that the risk of a future acute, potentially."),
+                React.createElement(Row, { label: "The historical position", val: "Catastrophic volvulus/incarceration event (see the main Gastric Volvulus card) justified prophylactic surgery even in asymptomatic patients." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "The more nuanced current approach", val: "Longer-term outcome data has shown that the annual risk of a genuine emergency presentation in an asymptomatic paraesophageal hernia is lower than previously assumed, and elective repair itself carries meaningful morbidity, particularly in older, frailer patients who are also the group most likely to have such a hernia in the first place \u2014 current practice increasingly favours a more individualised approach, offering elective repair to symptomatic patients (reflux, dysphagia, early satiety, anaemia from Cameron lesions) or those with genuinely high-risk anatomical features, while accepting a watchful-waiting approach in truly asymptomatic, higher-surgical-risk patients rather than automatically operating on every large hiatus hernia found incidentally." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Recurrence after gastropexy/hernia repair", val: "Recurrent herniation is a recognised long-term issue after paraesophageal hernia repair, particularly with primary suture repair of a large hiatal defect alone \u2014 mesh reinforcement of the hiatal repair is used in some cases to reduce this recurrence risk, balanced against a small additional risk of mesh-related complications (erosion, dysphagia) that must be weighed against the benefit in each individual patient." }),
+                React.createElement(Tip, null, "This shift from routine prophylactic repair toward a more individualised, symptom- and risk-based approach mirrors a broader pattern seen elsewhere in surgery (for example in asymptomatic gallstones or small AAAs) \u2014 a genuine, evolving move away from 'fix everything found' toward weighing the real event rate against the real cost of intervening on everyone."),
+                React.createElement(Ref, null, "Standard surgical teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-6", title: "Gastric Adenocarcinoma", icon: "\uD83C\uDF97\uFE0F", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "H. pylori infection (via chronic atrophic gastritis and intestinal metaplasia, the gastric equivalent of the Barrett's sequence above), a diet high in smoked/salted/nitrate-preserved food and low in fresh."),
+                React.createElement(Row, { label: "Risk factors", val: "Fruit/vegetables, blood group A, pernicious anaemia (itself producing atrophic gastritis independent of H. pylori), smoking, and hereditary diffuse gastric cancer syndrome (CDH1/E-cadherin germline mutation, warranting consideration of prophylactic gastrectomy in confirmed carriers)." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Staging", val: "TNM 8th edition staging combines depth of gastric wall invasion, regional nodal involvement, and distant metastasis, with staging laparoscopy specifically added before definitive surgery to detect small-volume peritoneal metastases (as for GOJ tumours above) that cross-sectional imaging can miss." }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83D\uDD2C" }, "Lauren Classification"),
+                React.createElement(Table, { color: "#0ea5e9", headers: ["Feature", "Intestinal type", "Diffuse type"], rows: [
+                        ["Histology", "Gland-like structures", "Poorly cohesive signet-ring cells infiltrating the gastric wall without forming discrete glands, reflecting loss of E-cadherin cell-adhesion function — the same gene mutated in hereditary diffuse gastric cancer"],
+                        ["Pathway", "Arises via the atrophic gastritis–intestinal metaplasia–dysplasia sequence, paralleling Barrett's disease biologically, just in the stomach rather than the esophagus", "Not sequence-driven in the same way — infiltrative growth from the outset"],
+                        ["Typical location & pattern", "More often distal", "Produces the diffusely thickened, non-distensible 'linitis plastica' stomach in advanced cases"],
+                        ["Spread & patient profile", "Spreads more haematogenously; generally a somewhat better prognosis", "Tends to affect younger patients; spreads more by direct/transmural and peritoneal routes"],
+                        ["Prognosis", "Comparatively better", "Generally worse, given the infiltrative growth pattern makes clear resection margins harder to achieve"],
+                    ] }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Surgical management", val: "Subtotal (distal) gastrectomy for tumours confined to the distal stomach with adequate proximal margin achievable, versus total gastrectomy for proximal or diffusely infiltrating (linitis plastica) tumours, combined with regional lymphadenectomy \u2014 the extent of lymph node dissection (D1 versus the more extensive D2) has been a long-running area of surgical debate, with D2 dissection by experienced surgeons now generally preferred in fit patients given the staging information and, in some analyses, survival benefit it provides." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Perioperative and palliative therapy", val: "Perioperative chemotherapy (before and after surgery) improves outcomes in resectable disease compared with surgery alone; palliative chemotherapy, and, in HER2-positive tumours specifically, trastuzumab-based regimens (the same HER2-targeted principle covered for breast cancer) extend survival in metastatic disease; palliative stenting or bypass surgery relieves obstruction where cure is not possible." }),
+                React.createElement(Ref, null, "Lauren classification; TNM 8th edition; standard surgical/oncology teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-7", title: "GIST", icon: "\uD83E\uDDEB", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Arises from the interstitial cells of Cajal, the GI tract's pacemaker cells responsible for coordinating peristalsis, most commonly in the stomach."),
+                React.createElement(Row, { label: "Origin", val: "(though it can arise anywhere along the GI tract, the small bowel being the second most common site, covered on the Small Bowel & IBD tab)." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Molecular driver", val: "An activating KIT mutation drives the majority of cases, with a smaller proportion driven by PDGFRA mutation instead \u2014 both converge on constitutive tyrosine kinase activation promoting uncontrolled proliferation, and this shared final pathway is exactly what makes both mutation types susceptible to the same targeted drug." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Risk stratification", val: "Behaviour ranges from indolent to frankly malignant, correlating with tumour size, mitotic rate, and anatomical site (gastric GISTs behave somewhat less aggressively size-for-size than small bowel GISTs) rather than a simple benign/malignant histological binary as seen in most other tumour types." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Management", val: "Surgical resection with clear margins (formal lymphadenectomy is not routinely required, since GISTs rarely spread via lymphatics) is the mainstay for localised disease; imatinib, a tyrosine kinase inhibitor targeting the KIT/PDGFRA pathway, is used as adjuvant therapy in higher-risk resected disease and as primary therapy in unresectable or metastatic GIST \u2014 one of the clearest examples in GI surgical oncology of a genuinely targeted, mutation-specific systemic therapy, and a useful contrast against gastric adenocarcinoma's more traditional chemotherapy-based approach." }),
+                React.createElement(Ref, null, "Standard surgical/oncology teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-8", title: "Gastric Lymphoma", icon: "\uD83E\uDDA0", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Chronic H. pylori infection drives sustained lymphoid proliferation within gastric mucosa-associated lymphoid tissue."),
+                React.createElement(Row, { label: "H. pylori association", val: "(tissue that is not normally present in significant quantity in the healthy stomach, but is acquired in response to chronic H. pylori-driven inflammation), which can progress to a low-grade B-cell (MALT) lymphoma." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "The most distinctive management feature", val: "Eradicating the underlying H. pylori infection alone induces regression in a substantial proportion of early-stage, localised MALT lymphomas \u2014 making anti-H. pylori antibiotic therapy legitimate first-line treatment rather than surgery, chemotherapy, or radiotherapy, a genuinely unusual situation in oncology where treating an infection is primary cancer treatment." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "When further treatment is needed", val: "Persistent disease after eradication therapy, more advanced-stage disease, or transformation to high-grade (diffuse large B-cell) lymphoma requires escalation to radiotherapy or systemic chemotherapy following the same principles as lymphoma management elsewhere in the body." }),
+                React.createElement(Ref, null, "Standard surgical/oncology teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-8b", title: "Screening & Early Gastric Ca", icon: "\uD83D\uDD0E", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "Japan and South Korea run population-level endoscopic gastric cancer screening programmes, reflecting the substantially higher background incidence of gastric cancer in these populations compared with most Western."),
+                React.createElement(Row, { label: "Why screening exists in some countries and not others", val: "Countries \u2014 the cost-effectiveness of population screening depends heavily on baseline disease incidence, which is precisely why equivalent programmes are not generally run in lower-incidence Western populations despite gastric cancer being far from rare there." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Early gastric cancer (EGC) \u2014 a specific, favourable-prognosis category", val: "Defined as invasive adenocarcinoma confined to the mucosa or submucosa, regardless of lymph node status \u2014 this depth-based definition (rather than a size-based one) exists because depth of invasion is what most reliably predicts nodal metastasis risk in gastric cancer, and EGC by this definition carries a dramatically better prognosis than more deeply invasive disease of an equivalent overall stage." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Endoscopic submucosal dissection (ESD)", val: "An advanced endoscopic technique that resects early gastric cancer en bloc directly from the mucosal/submucosal plane without any external incision, appropriate for carefully selected EGC meeting defined size, differentiation, and ulceration criteria that predict a very low risk of nodal involvement \u2014 where these criteria are met, ESD can be genuinely curative while avoiding the morbidity of formal gastrectomy entirely, a striking contrast with the major surgical resection required for more advanced disease covered on the main Gastric Adenocarcinoma card." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Why this matters even outside high-screening-incidence countries", val: "The concept and criteria for early gastric cancer and endoscopic resection are directly applicable anywhere a gastric cancer happens to be detected at an early stage \u2014 whether through a population screening programme, incidental endoscopy for unrelated dyspepsia, or surveillance in a high-risk individual (e.g. known atrophic gastritis or pernicious anaemia) \u2014 meaning the practical relevance of this category extends well beyond the specific countries that run formal population screening for it." }),
+                React.createElement(Ref, null, "Standard surgical/oncology teaching (Bailey & Love).")),
+            React.createElement(DiseaseCard, { id: "card-8c", title: "Benign Tumours", icon: "\uD83D\uDFE2", color: "#0ea5e9" },
+                React.createElement(Box, { color: "#0ea5e9", title: "Overview" }, "The most common gastric polyp type overall, arising from oxyntic (acid-secreting) mucosa in the fundus/body \u2014 strongly associated with long-term proton pump inhibitor use."),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83E\uDEE7" }, "Gastric Polyps"),
+                React.createElement(Table, { color: "#0ea5e9", headers: ["Polyp type", "Key features"], rows: [
+                        ["Fundic gland polyps — most common gastric polyp type overall", "Arise from oxyntic (acid-secreting) mucosa in the fundus/body — strongly associated with long-term PPI use (thought to relate to sustained hypergastrinaemia); in a distinct and important minority, associated with familial adenomatous polyposis, where they can be numerous and, unusually for this polyp type, carry genuine dysplasia/malignancy risk in the FAP setting. Sporadic fundic gland polyps carry essentially negligible malignant potential"],
+                        ["Hyperplastic polyps", "Arise as a reactive, regenerative response to chronic mucosal injury, most commonly chronic H. pylori gastritis — eradicating the infection can cause these to regress or resolve entirely (mirroring the same logic seen with gastric MALT lymphoma). Larger polyps (generally over 1cm) still warrant removal given a small but real risk of harbouring dysplasia"],
+                        ["Gastric adenomatous polyps", "Genuinely premalignant, following essentially the same adenoma-to-carcinoma logic as colonic adenomas — risk of malignant transformation correlates with polyp size and degree of dysplasia, so these are removed endoscopically when found, with surveillance thereafter given the field-change risk of further polyps developing elsewhere"],
+                    ] }),
+                React.createElement(SubHead, { color: "#0ea5e9", icon: "\uD83E\uDDEC" }, "Duodenal Tumors"),
+                React.createElement(Row, { c: "#0ea5e9", label: "Duodenal adenoma", val: "Most clinically significant in the periampullary region, since these carry malignant potential paralleling colonic adenomas and can progress to periampullary adenocarcinoma (see the Gastric Adenocarcinoma card's note on periampullary duodenal cancer) \u2014 patients with FAP develop duodenal (particularly periampullary) polyposis with near-universal certainty given long enough follow-up, making upper GI endoscopic surveillance a standard, lifelong part of FAP management alongside the colonic surveillance/prophylactic colectomy already covered in the Large Intestine material." }),
+                React.createElement(Row, { c: "#0ea5e9", label: "Brunner gland hamartoma", val: "A rare, benign submucosal nodule arising from hyperplasia of Brunner's glands (mucus-secreting glands specific to the duodenal bulb, whose normal function is to protect the duodenal mucosa from gastric acid entering from the stomach) \u2014 usually asymptomatic and found incidentally, though larger lesions can rarely cause obstruction or bleeding; endoscopic or surgical removal is reserved for symptomatic lesions rather than performed routinely for an incidental small finding." }),
+                React.createElement(Tip, null, "The organising idea across nearly all of these benign lesions is the same: most gastric and duodenal polyps are reactive/hyperplastic and carry negligible risk on their own, but the same anatomical sites are also where FAP-associated polyposis concentrates outside the colon \u2014 which is precisely why FAP surveillance protocols extend to the upper GI tract rather than stopping at the colon."),
+                React.createElement(Ref, null, "Standard surgical/gastroenterology teaching (Bailey & Love; Kumar & Clark).")))),
+    };
+    return (React.createElement("div", { className: "surg-serif-scope", style: { background: BG2, minHeight: "100vh", fontFamily: FF2, position: "relative" } },
+        React.createElement("style", null, `
+        .caliph-wrap .surg-serif-scope, .caliph-wrap .surg-serif-scope * { font-family:'Spectral',serif !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&display=swap');
+        @keyframes giuDrift { from { background-position: 0 0; } to { background-position: 200px 100px; } }
+        @keyframes cvsFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+        .giu-pattern-bg {
+          position: fixed; inset: 0; z-index: 0; pointer-events: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='60' viewBox='0 0 110 60'%3E%3Cpath d='M6,30 Q20,10 34,30 Q48,50 62,30 Q76,10 90,30' fill='none' stroke='%2322c55e' stroke-width='1.4' stroke-opacity='0.7' stroke-linecap='round'/%3E%3Cg fill='%2322c55e' fill-opacity='0.5' stroke='none'%3E%3Ccircle cx='20' cy='16' r='1.2'/%3E%3Ccircle cx='48' cy='46' r='1.2'/%3E%3Ccircle cx='76' cy='16' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+          background-size: 100px 50px;
+          opacity: 0.20;
+          animation: giuDrift 65s linear infinite;
+        }
+        .cvs-tab-content { animation: cvsFadeIn 0.25s ease; }
+      `),
+        React.createElement("div", { className: "giu-pattern-bg" }),
+        React.createElement("div", { style: {
+                position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
+                background: "radial-gradient(ellipse 100% 50% at 50% 0%, rgba(34,197,94,0.12), transparent 60%)",
+            } }),
+        React.createElement("div", { style: {
+                background: "rgba(8,8,8,0.82)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+                borderBottom: `1px solid ${AC}22`,
+                padding: "16px 16px 4px",
+                position: "sticky", top: 0, zIndex: 50,
+            } },
+            React.createElement("div", { style: { fontSize: 8, letterSpacing: "0.21em", color: TX3, textTransform: "uppercase", marginBottom: 3, textAlign: "center" } }, "Surgery II \u00B7 Upper GI"),
+            React.createElement("div", { style: {
+                    fontSize: 20, fontWeight: 900, letterSpacing: "-0.3px", marginBottom: 10,
+                    fontFamily: "'Spectral',Georgia,serif", textAlign: "center",
+                    background: `linear-gradient(135deg,#fff 15%,${AC} 60%,#15803d 100%)`,
+                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                } }, "Upper GI"),
+            React.createElement(LoToggle, null),
+            React.createElement("div", { style: { display: "flex", gap: 5, overflowX: "auto", overflowY: "visible", padding: "7px 3px 8px 3px", scrollbarWidth: "none" } }, tabs.map(t => {
+                const isActive = tab === t.id;
+                return (React.createElement("button", { key: t.id, onClick: () => { resetScrollTop(); setTab(t.id); }, style: {
+                        flexShrink: 0, padding: "5px 11px",
+                        borderRadius: 20,
+                        background: isActive
+                            ? `linear-gradient(135deg, ${t.color}22, ${t.color}08)`
+                            : "transparent",
+                        border: `1px solid ${isActive ? t.color + "70" : t.color + "22"}`,
+                        color: isActive ? t.color : t.color + "99",
+                        fontSize: 10.5, fontWeight: isActive ? 700 : 500,
+                        cursor: "pointer", fontFamily: FF2,
+                        display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5,
+                        whiteSpace: "nowrap",
+                        transition: "all 0.3s cubic-bezier(0.34,1.2,0.64,1)",
+                        boxShadow: isActive ? `0 0 14px -3px ${t.color}88, inset 0 0 10px -4px ${t.color}55` : "none",
+                        transform: isActive ? "scale(1.03)" : "scale(1)",
+                    } },
+                    React.createElement("span", { style: { fontSize: 12, filter: `drop-shadow(0 0 3px ${t.color}77)` } }, t.icon),
+                    React.createElement("span", { style: { letterSpacing: "0.01em" } }, t.label)));
+            }))),
+        React.createElement("div", { key: tab, className: "cvs-tab-content", style: { padding: "20px 14px 80px", maxWidth: 500, margin: "0 auto", position: "relative", zIndex: 1 } }, withLOs(tab, content[tab]) || (React.createElement(Box, { color: "#888", title: "Coming Soon" }, "Content for this section is being developed.")))));
+}
+
+/* ══════════ LEARNING OBJECTIVES (Upper GI — S2-018 to S2-022) ══════════ */
+try { if (localStorage.getItem("gitsurg:los") === "1") document.body.classList.add("los-on"); } catch (e) {}
+const LOS = {
+    "S2-018": { topic: "Surgical Anatomy", items: [
+        "Identify key structures that must be preserved during gastrointestinal surgery." ] },
+    "S2-019": { topic: "Esophageal Obstruction", items: [
+        "Enlist common benign and malignant causes of esophageal obstruction.",
+        "Describe clinical features and basic diagnostic approach.",
+        "Outline principles of surgical and non-surgical management.",
+        "Identify possible complications and basic preventive measures.",
+        "Discuss causes, clinical signs, and surgical management of esophageal perforation." ] },
+    "S2-020": { topic: "Peptic Ulcers", items: [
+        "Identify clinical features, diagnostic methods, complications, and treatment options.",
+        "Describe the role of H. pylori in gastritis and peptic ulcer disease." ] },
+    "S2-021": { topic: "Gastric Volvulus and Perforation", items: [
+        "Diagnose gastric volvulus through clinical signs and imaging findings.",
+        "Describe the causes, presentation, and diagnosis of gastric perforation.",
+        "Plan the surgical management for gastric volvulus and perforation." ] },
+    "S2-022": { topic: "Gastric Tumors", items: [
+        "Explain classification, staging, prognosis, and surgical management.",
+        "Outline GIST, lymphomas, and benign gastric and duodenal tumors, with surgical relevance." ] },
+};
+/* which card each topic's LOs sit above, per tab */
+const LO_BEFORE = {
+    anatomy: { "card-0": "S2-018" },
+    upperGI: { "card-0": "S2-019", "card-2": "S2-020", "card-4": "S2-021", "card-6": "S2-022" },
+};
+function LOPanel({ code }) {
+    const lo = LOS[code];
+    return React.createElement("div", { className: "lo-panel" },
+        React.createElement("div", { className: "lo-panel__head" },
+            React.createElement("span", { className: "lo-panel__code" }, code),
+            React.createElement("span", { className: "lo-panel__topic" }, lo.topic),
+            React.createElement("span", { className: "lo-panel__tag" }, "Learning Objectives")),
+        React.createElement("ul", null, lo.items.map((t, i) => React.createElement("li", { key: i }, t))));
+}
+function withLOs(tabId, el) {
+    const map = LO_BEFORE[tabId];
+    if (!el || !map) return el;
+    const out = [];
+    React.Children.toArray(el.props.children).forEach(k => {
+        const code = k && k.props && map[k.props.id];
+        if (code) out.push(React.createElement(LOPanel, { key: "lo-" + code, code }));
+        out.push(k);
+    });
+    return React.cloneElement(el, null, out);
+}
+/* Owns its own state + toggles a body class, so the module (and its open cards) never re-renders */
+function LoToggle() {
+    const [on, setOn] = useState(() => document.body.classList.contains("los-on"));
+    const flip = () => {
+        const n = !on;
+        document.body.classList.toggle("los-on", n);
+        try { localStorage.setItem("gitsurg:los", n ? "1" : "0"); } catch (e) {}
+        setOn(n);
+    };
+    return React.createElement("button", { className: "lo-toggle" + (on ? " lo-toggle--on" : ""), onClick: flip, "aria-pressed": on, "aria-label": "Toggle learning objectives" },
+        React.createElement("span", { className: "lo-toggle__dot" }), "LOs " + (on ? "ON" : "OFF"));
+}
+
+function OverviewToggle(p) {
+    const h = React.createElement, [o, setO] = useState(false), c = p.color || "#22c55e";
+    const btn = { cursor: "pointer", background: "transparent", color: c, fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" };
+    if (!o) return h("button", { onClick: () => setO(true), style: { ...btn, display: "block", width: "100%", textAlign: "left", padding: "8px 12px", marginBottom: 12, borderRadius: 10, border: "1px dashed " + c + "55" } }, "\u25B8 Overview \u00B7 tap to expand");
+    return h("div", null, h(p.Base, { color: p.color, title: "Overview" }, p.children),
+        h("button", { onClick: () => setO(false), style: { ...btn, border: 0, padding: "0 4px 12px", marginTop: -4 } }, "\u25B4 Hide overview"));
+}
+function KV(k, v) { return React.createElement("div", { style: { marginBottom: 7 } }, React.createElement("b", { style: { color: "#f0f1f5" } }, k), " \u2014 ", v); }
+
+/* ══════════ MCQ VIGNETTES (Upper GI) ══════════ */
+const MCQS = [
+["S2-018","While dividing the duodenum just beyond the pylorus during a distal gastrectomy for a posterior ulcer, which pair of structures lies immediately behind the first part of the duodenum and is most at risk?",["Splenic artery and left gastric vein","Superior mesenteric vein and uncinate process","Gastroduodenal artery and common bile duct","Right gastroepiploic vein and middle colic vein","IVC and right renal vein"],2,"The GDA and CBD (with the portal vein) lie posterior to D1. Stay on the duodenal wall when dissecting a posterior ulcer. The other pairs lie lower, to the left, or retroperitoneally."],
+["S2-018","A 58-year-old man undergoes oesophagectomy and the stomach is tubularised and pulled up as the conduit. Which vessel must be preserved above all to keep the conduit viable?",["Left gastric artery","Short gastric arteries","Splenic artery","Right gastroepiploic artery","Left gastroepiploic artery"],3,"Left gastric, short gastrics and left gastroepiploic are divided. The conduit survives on the right gastroepiploic arcade (from the GDA), so protect it and avoid pedicle traction to limit ischaemia and anastomotic leak."],
+["S2-019","A 66-year-old man has 3 months of progressive dysphagia. Endoscopy shows a 5 cm ulcerating tumour at 34 cm from the incisors; biopsy confirms adenocarcinoma. CT shows no distant disease. Which investigation best defines T and N stage next?",["Barium swallow","Endoscopic ultrasound","Bone scan","Repeat endoscopy with brushings","Chest radiograph"],1,"EUS gives depth of invasion (T) and regional nodes (N, with FNA). PET-CT or laparoscopy then look for occult metastases. Barium adds nothing to staging."],
+["S2-019","A 27-year-old woman has 18 months of dysphagia to solids and liquids from the outset, regurgitation of undigested food and 6 kg weight loss. Endoscopy shows a dilated, food-filled oesophagus with no mucosal lesion; barium shows a bird's beak. Which test confirms the diagnosis?",["24-hour pH monitoring","High-resolution manometry","CT chest with contrast","Repeat endoscopy with GOJ biopsies","Serum anti-parietal cell antibodies"],1,"Manometry shows incomplete LES relaxation with absent peristalsis. Endoscopy/EUS excludes pseudoachalasia from a GOJ tumour. Treatment: Heller myotomy with partial fundoplication, POEM or pneumatic dilatation."],
+["S2-019","A 52-year-old man has severe retrosternal pain and neck crepitus after violent vomiting following a binge. At 8 hours: HR 118, T 38.6 C, left pleural effusion, and a water-soluble swallow shows a leak into the left chest. Best management?",["Nil by mouth, PPI and antibiotics alone","Nasogastric tube and observation","Pleural aspiration and review at 24 hours","Urgent repair with buttress, wide pleural drainage and broad-spectrum antibiotics","Immediate oesophagectomy"],3,"Boerhaave (distal left posterolateral tear) with sepsis and pleural contamination within 24 hours: primary repair reinforced with a flap or patch, plus drainage. Non-operative care or stenting suits contained, stable, minimally contaminated cases; resection is for extensive necrosis or underlying malignancy."],
+["S2-020","A 61-year-old man on omeprazole for 4 weeks presents with haematemesis. Endoscopy shows a 1.5 cm clean-based lesser-curve gastric ulcer; biopsies are taken and the rapid urease test is negative. What is the most appropriate interpretation?",["H. pylori is excluded; no further testing","Likely false negative (PPI, bleeding); confirm with serology or repeat testing, and plan repeat endoscopy to confirm healing","Start eradication only if the ulcer fails to heal","H. pylori is irrelevant to gastric ulcers","Proceed to vagotomy and drainage"],1,"PPIs, recent antibiotics and bleeding reduce sensitivity of urease, breath and stool tests; serology is unaffected (but cannot prove cure). Gastric ulcers need repeat endoscopy with biopsies at 6-8 weeks to confirm healing and exclude malignancy."],
+["S2-020","A 74-year-old man with a posterior duodenal bulb ulcer and a spurting vessel receives adrenaline and clips. Twenty hours later he rebleeds with BP 85/50 despite resuscitation. Which vessel is the likely source and what is the best next step?",["Right gastric artery; observe","Left gastric artery; urgent splenectomy","Gastroduodenal artery; repeat endoscopic therapy, then angioembolisation or surgery if it fails","Superior pancreaticoduodenal vein; transfusion only","Inferior pancreaticoduodenal artery; PPI infusion only"],2,"Posterior bulb ulcers erode the GDA. After rebleeding, a second endoscopic attempt is standard; if it fails or he remains unstable, proceed to angioembolisation or surgery (duodenotomy with three-point underrunning of the GDA)."],
+["S2-021","A 71-year-old woman with a large hiatus hernia develops sudden severe epigastric pain, unproductive retching and cannot have a nasogastric tube passed. CXR shows a retrocardiac gas-fluid level; she is haemodynamically stable. Best management?",["Elective repair after outpatient review","Barium meal and observe for 48 hours","Endoscopic detorsion and discharge","Total gastrectomy regardless of viability","Urgent surgery: reduce and detorse, assess viability, repair hernia with gastropexy"],4,"Borchardt's triad indicates acute gastric volvulus, an emergency because of ischaemia and perforation risk. Reduce, check viability (resect only if necrotic), repair the hernia and fix the stomach. Endoscopic decompression is a bridge in high-risk patients."],
+["S2-021","A 67-year-old man on long-term NSAIDs has peritonitis with free air on erect CXR. At laparotomy there is a 3 cm perforation on the lesser curve with indurated edges. What is the most important additional step?",["Graham omental patch alone","Truncal vagotomy and pyloroplasty","Biopsy or excision of the ulcer edge with repair, then H. pylori testing and stopping NSAIDs","Lavage and closure without repair","Immediate total gastrectomy"],2,"A perforated gastric ulcer may be malignant, so biopsy or excise it. Patch-only repair suits duodenal ulcers; very large or unsuitable ulcers may need resection."],
+["S2-022","A 55-year-old woman has a 6 cm gastric mass. EUS shows a hypoechoic lesion arising from the muscularis propria; biopsy shows spindle cells positive for CD117 and DOG1. CT shows no metastases. Best treatment?",["D2 gastrectomy with extended lymphadenectomy","Complete resection with negative margins (e.g. wedge), no routine lymphadenectomy","Neoadjuvant chemoradiotherapy","Imatinib alone indefinitely","Yearly surveillance endoscopy"],1,"GISTs spread haematogenously and rarely to nodes. Aim for R0 resection without tumour rupture. Neoadjuvant imatinib is for borderline-resectable disease; adjuvant imatinib depends on size, mitotic rate, site and rupture."],
+["S2-022","A 63-year-old man has T3N1 distal gastric adenocarcinoma on CT and EUS with no visible distant disease. Which investigation best avoids a non-therapeutic laparotomy?",["Serum CEA","Bone scan","Repeat CT with oral contrast","Staging laparoscopy with peritoneal washings","Gastric lavage cytology"],3,"CT misses small peritoneal and liver deposits; positive washings mean stage IV. If resectable, perioperative chemotherapy with D2 gastrectomy is standard."],
+["S2-022","A 49-year-old woman with dyspepsia has biopsies showing low-grade gastric MALT lymphoma confined to the mucosa and submucosa. She is H. pylori positive and t(11;18) negative. First-line treatment?",["Total gastrectomy","R-CHOP chemotherapy","H. pylori eradication therapy","Gastric radiotherapy","Splenectomy"],2,"Eradication induces remission in most early H. pylori-positive cases; t(11;18) predicts non-response. Follow with endoscopy and biopsy; use radiotherapy or rituximab if persistent, and surgery only for complications."],
+["S2-018","During a laparoscopic fundoplication, a surgeon creates the retro-oesophageal window with blunt dissection. Which structure, lying against the right posterolateral oesophageal wall near the right crus, is at greatest risk, causing postoperative gastric stasis if injured?",["Left phrenic nerve","Posterior vagal trunk","Thoracic duct","Coeliac ganglion","Left gastric artery"],1,"The posterior vagal trunk runs behind the oesophagus close to the right crus; the anterior trunk sits on the anterior wall. Identify and keep both on the oesophagus when wrapping."],
+["S2-019","A 72-year-old woman has regurgitation of undigested food, halitosis, a gurgling sound in the neck and intermittent dysphagia, without weight loss. What is the best initial investigation?",["Blind rigid endoscopy","Oesophageal manometry","24-hour pH monitoring","CT neck","Contrast swallow, with endoscopy only with great caution"],4,"Features of a pharyngeal (Zenker) pouch. A contrast swallow shows the pouch; endoscopy risks perforating it. Definitive treatment is surgical or endoscopic diverticulotomy with cricopharyngeal myotomy."],
+["S2-019","An 18-hour-old alkali ingestion presents with drooling and dysphonia but a stable airway. After airway assessment and resuscitation, what is the most appropriate next step?",["Induce vomiting","Neutralise with a weak acid","Early endoscopy to grade the injury","Immediate barium swallow","Blind nasogastric lavage"],2,"Never induce emesis or neutralise. Endoscopy within roughly 12-48 hours grades injury and guides management; avoid it in suspected perforation. Late stricture and squamous carcinoma risk need follow-up."],
+["S2-019","A 56-year-old man with long-standing reflux has a 4 cm Barrett segment with a visible nodule. Biopsies show high-grade dysplasia confirmed by two expert pathologists. Best management?",["Lifelong PPI and annual surveillance","Immediate oesophagectomy","Gastric fundoplication","Endoscopic resection of the nodule then radiofrequency ablation","Neoadjuvant chemoradiotherapy"],3,"EMR of visible lesions gives accurate T staging and treatment; ablation then eradicates residual metaplasia. Oesophagectomy is reserved for deeper invasion or failure."],
+["S2-019","A fit 60-year-old man has a mid-oesophageal squamous cell carcinoma, T3N1 on EUS, with no distant disease. What is the standard curative approach?",["Neoadjuvant chemoradiotherapy then oesophagectomy","Surgery alone","Endoscopic mucosal resection","Palliative stenting","Oesophageal bypass"],0,"Locally advanced resectable disease benefits from multimodal therapy (e.g. CROSS-type chemoradiotherapy). Definitive chemoradiotherapy is an option for proximal tumours or poor surgical candidates."],
+["S2-019","A 78-year-old man with unresectable stage IV oesophageal cancer and an expected survival under 3 months has severe dysphagia. Which option gives the fastest sustained relief?",["Oesophagectomy","Gastrostomy tube alone","Repeated bougie dilatation","Radiotherapy alone","Self-expanding metal stent"],4,"A stent relieves dysphagia within days. Brachytherapy or radiotherapy act more slowly but last longer. Complications include migration, perforation, reflux and tumour overgrowth."],
+["S2-020","A penicillin-allergic man with a duodenal ulcer is H. pylori positive and treatment-naive. Which first-line regimen is most appropriate?",["PPI, bismuth, tetracycline and metronidazole for 14 days","PPI, amoxicillin and clarithromycin for 7 days","PPI alone for 8 weeks","Clarithromycin monotherapy","PPI and levofloxacin for 3 days"],0,"Bismuth quadruple therapy avoids penicillin and is a preferred first line. Confirm eradication at least 4 weeks after therapy and 2 weeks off PPI."],
+["S2-020","A 68-year-old man with chronic duodenal ulcer disease has repeated large-volume vomiting of food eaten days earlier, a succussion splash and hypochloraemic, hypokalaemic metabolic alkalosis. What is the best initial step?",["Immediate gastrojejunostomy","IV PPI only","Barium meal","NG decompression with IV saline and potassium replacement","Urgent vagotomy"],3,"Gastric outlet obstruction first needs decompression and correction of fluid and electrolytes. Endoscopy with biopsy then excludes malignancy; dilatation or surgery (gastrojejunostomy or antrectomy) follows."],
+["S2-020","A 45-year-old man with free air has a 6-hour history of perforation of a duodenal ulcer, is stable and has localised peritonitis. Which management is correct?",["Routine highly selective vagotomy","Billroth II gastrectomy","Taylor's non-operative regimen in all patients","Total gastrectomy","Omental patch repair with lavage, then H. pylori eradication"],4,"Omental (Graham) patch repair, laparoscopic where possible, is standard; treat H. pylori and stop NSAIDs. Acid-reducing surgery is rarely needed today."],
+["S2-021","A 79-year-old woman has sudden epigastric pain and tenderness; erect chest radiograph shows no free air. She is stable and perforation is strongly suspected. What is the best next investigation?",["Repeat chest radiograph in 6 hours","Serum amylase only","CT abdomen with contrast","Barium meal","Diagnostic endoscopy"],2,"Plain films miss a proportion of free air. CT confirms perforation and its level. Avoid endoscopic insufflation and barium in suspected perforation."],
+["S2-021","Which statement about gastric volvulus is correct?",["Organoaxial rotation is commoner, usually accompanies a diaphragmatic defect and carries a higher strangulation risk","Mesenteroaxial volvulus is always acute and fatal","Gastric volvulus never occurs without a hiatus hernia","It is diagnosed best by endoscopy alone","Treatment is always conservative"],0,"Organoaxial rotation (around the cardia-pylorus axis) is the most frequent and is the type linked to strangulation. Mesenteroaxial volvulus rotates around the short axis and is often chronic or partial."],
+["S2-022","A 28-year-old woman with a CDH1 pathogenic variant and several relatives with diffuse gastric cancer has a normal endoscopy. What is the recommended management?",["Prophylactic total gastrectomy","Yearly CT","Eradication of H. pylori alone","Distal gastrectomy","Neoadjuvant chemotherapy"],0,"CDH1 variants give a very high lifetime risk of signet-ring diffuse cancer that endoscopy often misses. Prophylactic total gastrectomy is advised, with counselling."],
+["S2-022","A 62-year-old has a 1.5 cm well-differentiated, non-ulcerated mucosal intestinal-type gastric adenocarcinoma on endoscopy and EUS with no nodal disease. Best treatment?",["D2 total gastrectomy","Subtotal gastrectomy","Palliative chemotherapy","Observation","Endoscopic submucosal dissection"],4,"Small, differentiated, non-ulcerated mucosal lesions have a negligible nodal risk. ESD allows en-bloc resection; surgery is needed if histology shows deeper invasion or lymphovascular spread."],
+["S2-022","In gastric cancer, which finding alone upstages disease to M1 (stage IV)?",["Perigastric nodal involvement","Serosal invasion","Positive peritoneal washing cytology","Splenic hilar nodes","Omental invasion"],2,"Positive cytology counts as distant metastatic disease. Nodes are N staging; serosal invasion is T4a."],
+["S2-018","A surgeon plans to ligate the left gastric artery at its origin during a gastrectomy. Which step best avoids ischaemic injury to the left liver?",["Check the gastrohepatic ligament for a replaced left hepatic artery and preserve it if present","Ligate flush with the coeliac trunk in every case","Divide the gastrohepatic ligament blindly with diathermy","Clamp the proper hepatic artery first","Ligate only after splenectomy"],0,"A replaced or accessory left hepatic artery arises from the left gastric artery in roughly 10-15% of patients. Look for pulsation in the ligament and test-clamp before dividing."],
+["S2-018","After a three-stage oesophagectomy with a cervical anastomosis, a patient has a hoarse voice and a weak cough. Which injury is most likely, and why?",["Right vagus nerve, as it lies to the right of the oesophagus","Phrenic nerve, adjacent to the pericardium","Sympathetic chain behind the pleura","Left recurrent laryngeal nerve, which loops under the aortic arch and ascends in the tracheo-oesophageal groove","Superior laryngeal nerve, which runs with the superior thyroid artery"],3,"The left RLN has a long course beside the oesophagus and is vulnerable to traction, thermal injury, ischaemia and nodal dissection."],
+["S2-018","Which nodal group is first-echelon drainage for a distal greater-curve gastric tumour and must be cleared in a distal gastrectomy?",["Para-aortic nodes","Splenic hilar nodes","Left gastric nodes only","Retropancreatic nodes only","Infrapyloric nodes along the right gastroepiploic vessels"],4,"The distal greater curve drains along the right gastroepiploic vessels to infrapyloric nodes. D2 dissection also clears the left gastric, hepatic artery, coeliac and splenic artery stations; splenic hilar nodes matter for proximal greater-curve tumours."],
+["S2-019","On day 3 after oesophagectomy, a chest drain yields 900 mL/day of milky fluid. Which test confirms the diagnosis?",["Pleural fluid amylase","Pleural fluid pH","Pleural fluid triglyceride above 1.24 mmol/L","Pleural fluid LDH","Serum albumin"],2,"This is a chyle leak from thoracic duct injury. Initial treatment is fasting or a medium-chain-triglyceride diet with drainage (octreotide sometimes); persistent high output needs thoracic duct ligation."],
+["S2-019","A 76-year-old woman has postprandial chest pain, early satiety and iron-deficiency anaemia. CT shows a type III (paraoesophageal) hiatus hernia with the fundus in the chest. Best management?",["Elective laparoscopic repair with sac excision, crural closure and gastropexy or fundoplication","Observation, since these hernias never complicate","PPI and iron alone","Open total gastrectomy","Endoscopic clipping of the hernia"],0,"Symptomatic type III hernias should be repaired because of the risk of obstruction, volvulus and strangulation; the anaemia suggests Cameron lesions. Asymptomatic patients may be watched."],
+["S2-019","A 24-year-old man with asthma and eczema has recurrent solid-food impaction. Endoscopy shows concentric rings and linear furrows. What is the most appropriate next step?",["Immediate pneumatic dilatation","Multiple biopsies from proximal and distal oesophagus","Heller myotomy","Barium swallow only","Anti-reflux surgery"],1,"This is eosinophilic oesophagitis; diagnosis needs biopsies (15 or more eosinophils per high-power field) even if mucosa looks normal. Treat with PPI, topical steroids or diet; dilate cautiously."],
+["S2-019","A patient develops neck pain, crepitus and fever 6 hours after a difficult endoscopy. A contrast swallow shows a small contained cervical oesophageal leak and he is stable. Best management?",["Immediate oesophagectomy","Thoracotomy and primary repair","Early oral feeding with analgesia","Nil by mouth, antibiotics and nutrition, with drainage if a collection forms","Observation with no antibiotics"],3,"Small contained cervical leaks usually heal with conservative treatment. Operate for collections, sepsis or mediastinal extension."],
+["S2-020","A 65-year-old man with a bleeding gastric ulcer must continue low-dose aspirin for coronary stents. What is the best strategy?",["Stop aspirin permanently","Continue aspirin without gastroprotection","Continue aspirin with PPI cover, test and eradicate H. pylori, and restart early once haemostasis is secure","Replace aspirin with ibuprofen","Perform vagotomy"],2,"Stopping aspirin in stented patients risks thrombosis, and early restart has benefit. PPI plus H. pylori eradication lowers rebleeding."],
+["S2-020","A 44-year-old man has recurrent ulcers in the second part of the duodenum and jejunum despite PPI, with chronic diarrhoea. Which test is most appropriate?",["Fasting serum gastrin with gastric pH, and secretin stimulation if equivocal","Serum CEA","Urea breath test only","Faecal calprotectin","Serum lipase"],0,"Suspect a gastrinoma (Zollinger-Ellison). PPIs raise gastrin, so interpret carefully; localise the tumour and screen for MEN1."],
+["S2-020","At endoscopy for melaena, a duodenal ulcer shows a non-bleeding visible vessel. What is the best approach?",["Observation only","Oral PPI and early discharge","Argon plasma coagulation alone","Immediate surgery","Combination endoscopic therapy (e.g. adrenaline plus clips), then high-dose IV PPI for 72 hours"],4,"A non-bleeding visible vessel (Forrest IIa) is a high-risk stigma. A clean base or flat spot needs no endoscopic therapy."],
+["S2-020","Fifteen minutes after meals following a distal gastrectomy, a patient has palpitations, flushing, diarrhoea and cramps. What is the first-line management?",["Immediate revision to Roux-en-Y","Small frequent low-carbohydrate meals, separating fluids from solids","Large high-sugar meals","Prolonged fasting","Prokinetics"],1,"Early dumping responds to dietary change in most patients. Acarbose or octreotide is used if refractory; revision surgery is rarely needed."],
+["S2-021","Which three factors make up the Boey score used to predict mortality after perforated peptic ulcer?",["Age, sex and smoking","Haemoglobin, white cell count and CRP","Ulcer size, site and H. pylori status","Preoperative shock, major medical illness and perforation for more than 24 hours","Pneumoperitoneum, ascites and fever"],3,"Each factor adds risk; with none, mortality is low, and it rises sharply with all three."],
+["S2-021","A 70-year-old woman has postprandial epigastric pain and early satiety. A barium meal shows a long-standing upside-down stomach. She is stable with no ischaemia. Best management?",["Emergency laparotomy","Lifelong PPI only","Elective laparoscopic reduction, hernia repair and gastropexy","Subtotal gastrectomy","Endoscopic dilatation"],2,"Chronic intermittent volvulus with a paraoesophageal hernia can be repaired electively. Reduce, repair the defect and fix the stomach."],
+["S2-022","Which feature best fits intestinal-type gastric adenocarcinoma rather than the diffuse type?",["Occurs in young patients with CDH1 mutation","Association with H. pylori-driven atrophy and intestinal metaplasia","Linitis plastica","Single infiltrating signet-ring cells","Equal sex distribution with no precursor lesion"],1,"The intestinal type follows the Correa cascade and tends to be distal and older-onset; the diffuse type is younger, CDH1-related and has a worse prognosis."],
+["S2-022","A 68-year-old with an unresectable obstructing distal gastric cancer and liver metastases has persistent vomiting and an expected survival of about 6 months. What is the best palliation of outlet obstruction?",["Duodenal or pyloric stent regardless of prognosis","Total gastrectomy","Palliative radiotherapy alone","Gastrojejunostomy; stents suit very short life expectancy","Repeated endoscopic dilatation"],3,"Stents relieve vomiting faster but obstruct again more often. Gastrojejunostomy gives longer-lasting relief if survival exceeds a few months."],
+["S2-022","A 58-year-old has a bulky gastric ulcer; biopsy shows diffuse large B-cell lymphoma, Lugano stage II. First-line treatment?",["Total gastrectomy","H. pylori eradication alone","Observation","Splenectomy","R-CHOP-type chemoimmunotherapy"],4,"Unlike low-grade MALT lymphoma, DLBCL needs systemic therapy. Surgery is reserved for complications such as perforation or bleeding."],
+["S2-022","A 32-year-old with FAP has Spigelman stage IV duodenal polyposis. Which is most appropriate?",["Annual surveillance only","Duodenal surgery (pancreas-preserving duodenectomy or pancreaticoduodenectomy)","Endoscopic removal of every polyp","Total colectomy alone","PPI therapy"],1,"Stage IV carries a high risk of duodenal cancer. Lower stages are managed with surveillance and endoscopic therapy; colectomy does not address the duodenum."],
+["S2-022","A 52-year-old woman with pernicious anaemia has several 6 mm gastric polyps; biopsy shows well-differentiated neuroendocrine tumours with markedly raised gastrin. Best management?",["Total gastrectomy","Chemotherapy","Radiotherapy","Endoscopic resection with surveillance","Octreotide alone"],3,"This is a type 1 gastric NET driven by hypergastrinaemia from achlorhydria, which is usually indolent. Type 2 occurs with gastrinoma/MEN1; type 3 is sporadic and needs oncological resection."],
+["S2-018","Which structures traverse the oesophageal hiatus (T10) alongside the oesophagus?",["Thoracic duct and azygos vein","IVC and right phrenic nerve","Anterior and posterior vagal trunks","Aorta and thoracic duct","Splanchnic nerves"],2,"The hiatus, formed by fibres of the right crus, transmits the oesophagus, both vagal trunks and oesophageal branches of the left gastric vessels. The IVC passes at T8; the aorta, thoracic duct and azygos vein pass through the aortic hiatus at T12."],
+["S2-018","Which arteries supply the abdominal oesophagus and gastro-oesophageal junction?",["Oesophageal branches of the left gastric artery and left inferior phrenic artery","Inferior thyroid artery","Direct branches of the thoracic aorta only","Right gastric artery","Superior mesenteric artery"],0,"Oesophageal supply is segmental: inferior thyroid (cervical), aortic branches (thoracic), left gastric and inferior phrenic (abdominal). This fragile, segmental supply is why anastomoses and conduits leak."],
+["S2-019","A 34-year-old has episodic dysphagia to solids and liquids from the outset with chest pain. Endoscopy is normal and barium shows a corkscrew pattern. Most likely diagnosis?",["Peptic stricture","Carcinoma","Schatzki ring","Diffuse oesophageal spasm","Pharyngeal pouch"],3,"Solids and liquids affected together from onset point to a motility disorder rather than mechanical narrowing. Manometry shows premature contractions; achalasia instead shows incomplete LES relaxation."],
+["S2-019","A GP's barium swallow shows a 4 cm irregular stricture in a 59-year-old with progressive solid dysphagia and weight loss. Why is endoscopy still required?",["Barium cannot show strictures","It gives biopsy for histology and direct assessment of the mucosa, which contrast cannot","It replaces CT staging","Barium is contraindicated in malignancy","It measures depth through every layer"],1,"Contrast shows shape, not tissue. Endoscopy confirms histology and mucosal extent (including Barrett's); staging still needs EUS and CT."],
+["S2-019","In which situation is a contrast swallow best performed before endoscopy?",["Melaena","Haematemesis","Weight loss with dysphagia","Dyspepsia in a young patient","Suspected pharyngeal pouch with recurrent aspiration"],4,"Blind passage of the endoscope risks perforating a pouch, and contrast maps its anatomy first. For most other dysphagia, endoscopy comes first."],
+["S2-019","EUS shows an oesophageal tumour invading the muscularis propria but not the adventitia, with no nodal disease. What is the T stage?",["T1b","T3","T4a","T2","Tis"],3,"T1b is submucosa, T2 muscularis propria, T3 adventitia, T4a adjacent resectable structures such as pleura or diaphragm."],
+["S2-019","Which statement about T staging is correct?",["In hollow organs T is based mainly on tumour size in cm","Gastric T4a is invasion of the subserosa","In solid organs such as breast, T is based mainly on size","Oesophageal T1b is invasion of the lamina propria","Oesophageal T3 is invasion of the muscularis propria"],2,"Solid organs lack wall layers, so size drives T. Hollow organs use depth: gastric T3 is subserosa and T4a is serosa; oesophageal T1b is submucosa and T3 is adventitia."],
+["S2-019","A contrast swallow is requested for suspected oesophageal perforation. Which agent is appropriate first, and why?",["Water-soluble (isosmolar) contrast, because barium in the mediastinum causes severe inflammation","Barium, because it gives better detail and is harmless outside the lumen","Air only","Oral methylene blue","No contrast; endoscopy first in all cases"],0,"Use water-soluble contrast first, preferring an isosmolar agent if aspiration is possible. CT with oral contrast is an alternative; a negative study can be repeated with dilute barium for sensitivity."],
+["S2-020","Which barium meal appearance favours a malignant gastric ulcer?",["Crater projecting beyond the expected gastric contour","Smooth round crater with radiating folds reaching its edge","Hampton's line at the ulcer neck","Smooth regular edges on the lesser curve","Ulcer within a mass, with heaped irregular margins and clubbed or fused folds"],4,"Benign ulcers project outside the lumen with smooth edges and radiating folds. Malignant ulcers sit within the lumen contour inside a mass. Biopsy any gastric ulcer regardless."],
+["S2-020","Which physiological pattern is typical of H. pylori antral-predominant gastritis causing duodenal ulcer?",["Low acid output with gastric atrophy","Reduced gastrin with high somatostatin","Normal acid with intact bicarbonate","Raised gastrin and acid output, with gastric metaplasia in the duodenal bulb","Pernicious anaemia"],3,"Antral infection reduces D-cell somatostatin, raising gastrin and acid; gastric metaplasia in the bulb lets H. pylori colonise it. Pangastritis with atrophy and low acid predisposes to gastric ulcer and cancer instead."],
+["S2-020","A gastric ulcer has not healed after 12 weeks of PPI. What is the best next step?",["Double the PPI and wait another 12 weeks","Truncal vagotomy","Repeat endoscopy with multiple biopsies, and review NSAID use, H. pylori status and gastrinoma","Barium meal alone","Add misoprostol and discharge"],2,"Non-healing means malignancy, persistent H. pylori, covert NSAID use or hypersecretion until proven otherwise."],
+["S2-020","A 70-year-old on regular diclofenac develops a gastric ulcer. Which mechanism is mainly responsible?",["COX-1 inhibition lowering mucosal prostaglandins, mucus, bicarbonate and blood flow","Direct stimulation of parietal cells","Increased gastrin from antral G cells","Bile reflux","Loss of intrinsic factor"],0,"NSAIDs impair prostaglandin-mediated mucosal defence. Risk rises with age, steroids, anticoagulants and H. pylori."],
+["S2-021","A 78-year-old on long-term prednisolone has a perforated gastric ulcer but only mild tenderness and no rigidity. What is the key lesson?",["Perforation is excluded","Repeat examination only after 24 hours","Steroids always cause duodenal ulcers","Antibiotics are unnecessary","Steroids and age blunt peritoneal signs, so keep a low threshold for CT and early surgery"],4,"Immunosuppression and age mask peritonism and delay diagnosis, which raises mortality."],
+["S2-021","Which radiological finding is characteristic of acute organoaxial gastric volvulus?",["Single small air-fluid level in the antrum","Double air-fluid level (cardia and antrum) with a beak at the twist","Dilated caecum","Rigler's sign only","Normal stomach position with air under the diaphragm"],1,"Two air-fluid levels with a dilated stomach and a point of obstruction, usually with failure to pass an NG tube. CT confirms the twist and looks for ischaemia."],
+["S2-021","Which finding points to oesophageal rather than gastric perforation?",["Board-like abdominal rigidity only","Free air under the diaphragm only","Pneumoperitoneum with absent bowel sounds","Mediastinal emphysema with a crunch synchronous with the heartbeat (Hamman's sign)","Raised serum lipase only"],3,"Mediastinal air and neck crepitus indicate oesophageal perforation; free peritoneal air with generalised peritonitis suggests gastroduodenal perforation."],
+["S2-022","A tumour has its centre 3 cm below the gastro-oesophageal junction (Siewert III) with no distant disease. Which operation is typically planned?",["Ivor Lewis oesophagectomy","Proximal gastrectomy only","Total gastrectomy with D2 lymphadenectomy","Distal gastrectomy","Endoscopic resection"],2,"Siewert I (1-5 cm above the GOJ) is managed by oesophagectomy; II (1 cm above to 2 cm below) by either approach; III (2-5 cm below) as gastric cancer, usually total gastrectomy."],
+["S2-022","Which GIST genotype is classically resistant to imatinib?",["PDGFRA D842V","KIT exon 11 mutation","KIT exon 9 mutation","Any CD117-positive tumour","Any tumour over 5 cm"],0,"KIT exon 11 is most sensitive, KIT exon 9 needs a higher dose, and PDGFRA D842V is intrinsically resistant. Adjuvant therapy is chosen by risk (size, mitoses, site, rupture) and genotype."],
+["S2-022","A 66-year-old with weight loss and an epigastric mass has a hard left supraclavicular node. What does it imply?",["Benign reactive node","Resectable stage II disease","An indication for splenectomy","Early gastric cancer","Metastatic disease (Virchow's node, M1); curative resection is not appropriate"],4,"Virchow's node reflects distant nodal spread via the thoracic duct. Confirm with biopsy and stage; treatment becomes palliative or systemic."],
+];
+MCQS.sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+function McqQuiz() {
+    const h = React.createElement, L = "ABCDE";
+    const [i, setI] = useState(0), [pick, setPick] = useState(null), [score, setScore] = useState(0);
+    if (i >= MCQS.length) return h("div", { style: { textAlign: "center", padding: "40px 10px" } },
+        h("div", { style: { fontSize: 38, fontWeight: 800, color: "#fbbf24" } }, score + " / " + MCQS.length),
+        h("div", { className: "mcq-q" }, score >= MCQS.length * 0.8 ? "Strong performance." : "Revisit the explanations and the topic cards."),
+        h("button", { className: "mcq-btn", onClick: () => { setI(0); setPick(null); setScore(0); } }, "Restart"));
+    const q = MCQS[i], done = pick !== null;
+    return h("div", null,
+        h("div", { className: "mcq-meta" }, h("span", null, "Q" + (i + 1) + " / " + MCQS.length), h("span", { className: "lo-panel__code" }, q[0]), h("span", { style: { marginLeft: "auto" } }, "Score " + score)),
+        h("div", { className: "mcq-bar" }, h("i", { style: { width: (i / MCQS.length * 100) + "%" } })),
+        h("div", { className: "mcq-q" }, q[1]),
+        q[2].map((o, k) => h("button", { key: k, disabled: done,
+            className: "mcq-opt" + (done && k === q[3] ? " mcq-opt--ok" : done && k === pick ? " mcq-opt--no" : ""),
+            onClick: () => { setPick(k); if (k === q[3]) setScore(score + 1); } }, h("b", null, L[k]), h("span", null, o))),
+        done && h("div", { className: "mcq-exp" }, h("b", null, pick === q[3] ? "Correct. " : "Answer: " + L[q[3]] + ". "), q[4]),
+        done && h("button", { className: "mcq-btn", onClick: () => { setI(i + 1); setPick(null); } }, i + 1 < MCQS.length ? "Next" : "Finish"));
+}
+
+/* ══════════ DECREE POP-UP ══════════ */
+const EMBERS = Array.from({ length: 24 }, (_, i) => {
+    const r = (n) => { const x = Math.sin(i * 97.13 + n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+    return { id: i, left: r(1) * 100, size: 2 + r(2) * 3, dur: 6 + r(3) * 7, delay: r(4) * 8, dx: (r(5) - .5) * 80 };
+});
+function Sigil() {
+    const ticks = Array.from({ length: 24 }, (_, i) => React.createElement("line", { key: i, x1: 50, y1: 3, x2: 50, y2: i % 2 ? 7 : 10, transform: `rotate(${i * 15} 50 50)` }));
+    return React.createElement("svg", { viewBox: "0 0 100 100", className: "decree__sigil", "aria-hidden": "true" },
+        React.createElement("g", { fill: "none", stroke: "#e8c46a", strokeWidth: 1.1, strokeLinecap: "round" },
+            React.createElement("g", { className: "ring" }, React.createElement("circle", { cx: 50, cy: 50, r: 47, strokeOpacity: .7 }), ticks),
+            React.createElement("g", { className: "ring2" }, React.createElement("circle", { cx: 50, cy: 50, r: 38, strokeDasharray: "2 4", strokeOpacity: .8 })),
+            React.createElement("polygon", { points: "50,17 80,68 20,68", strokeWidth: 1.6 }),
+            React.createElement("path", { d: "M27,53 Q50,34 73,53 Q50,72 27,53 Z", fill: "#12020a", strokeWidth: 1.4 })),
+        React.createElement("circle", { className: "iris", cx: 50, cy: 53, r: 7.5, fill: "#b3122b", stroke: "#ff5c73", strokeWidth: 1 }),
+        React.createElement("ellipse", { cx: 50, cy: 53, rx: 2, ry: 6, fill: "#000" }));
+}
+const TITLES = [
+    "Criminal Genius|& Master of All Villainy!",
+    "Grand Vizier|of Last-Minute Panic",
+    "Duke of Dark Circles|& Lord of 3 a.m. Revision",
+    "Humble Servant|of the Snooze Button (Defeated)",
+    "Emperor of Highlighters|& Slayer of Unread Chapters",
+    "Grandmaster|of \u201CI\u2019ll Start Tomorrow\u201D",
+    "Baron von Caffeine|& Keeper of the Sacred Cold Coffee",
+    "Supreme Overlord|of Things You Should\u2019ve Read in March",
+    "Sovereign|of the Eleventh Hour",
+    "Professor Emeritus|of Cramming Sciences",
+    "Chief Scalpel-Bearer|& Fear of Appendices Everywhere",
+    "Lord Protector|of the Last Remaining Brain Cell",
+    "Archduke of Anatomy|& Tyrant of Tiny Nerves",
+    "Humble Destroyer|of Procrastination (Eventually)",
+    "Warden|of the Crumpled Past Papers",
+    "Grand Inquisitor|of Unanswered MCQs",
+    "Dread Pirate|of Pass Marks",
+    "Count Colonic|& Dread Lord of the Hindgut",
+    "Keeper of the Mnemonics|Nobody Asked For",
+    "Lord of the Flashcards|& Breaker of Sleep Schedules",
+    "Chancellor of Free Advice|Payable in Gratitude Only",
+    "Master Villain|of the Viva Voce",
+    "Napoleon of Notes|& Waterloo of Weekends",
+    "Eternal Rival|of the Examiner\u2019s Smirk",
+    "High Priest|of \u201CIs This High-Yield?\u201D",
+    "Overseer|of Overdue Study Plans",
+    "Sultan of the Small Bowel|& Viceroy of Viva Nerves",
+    "The Humblest Man in the Room|(Ask Him)",
+    "Supreme Commander|of Snack Reserves",
+    "Lord of the Syllabus|& Slave to the Deadline",
+    "Grandmaster of Pretending|to Understand Hernias",
+    "Baron of Bad Handwriting|& Worse Mnemonics",
+    "Chief Executive|of Executive Dysfunction",
+    "Marshal of the Midnight Oil|(Mildly Flammable)",
+    "Grand Duke|of \u201COne More Chapter\u201D",
+    "Terror of Tutorials|& Nemesis of Nap Time",
+    "Minister of Mischief|& Mild Inconvenience",
+    "Self-Appointed, Self-Anointed|& Self-Reviewed",
+    "Wizard of the Whiteboard|& Fraud on the Ward",
+    "Sultan of Sutures|& Keeper of the Knots",
+    "Regent of Rote Learning|& Defender of Dubious Shortcuts",
+    "Knight Commander|of the Sleepless Order",
+    "Your Emergency Tutor|(The Humblest Title of All)",
+];
+if (TITLES.length !== 43) throw new Error("Expected 43 titles, got " + TITLES.length);
+function Decree({ onEnter, leaving }) {
+    const [showAll, setShowAll] = useState(false);
+    useEffect(() => {
+        const k = (e) => {
+            if (showAll) { if (e.key === "Escape") setShowAll(false); return; }
+            if (e.target && e.target.closest && e.target.closest("[data-nokey]")) return;
+            if (e.key === "Enter" || e.key === " " || e.key === "Escape") onEnter();
+        };
+        window.addEventListener("keydown", k);
+        return () => window.removeEventListener("keydown", k);
+    }, [onEnter, showAll]);
+    const st = (d) => ({ animationDelay: d + "s" });
+    const [ti, setTi] = useState(0);
+    useEffect(() => {
+        let iv; const t0 = setTimeout(() => { iv = setInterval(() => setTi(i => (i + 1) % TITLES.length), 3600); }, 5200);
+        return () => { clearTimeout(t0); clearInterval(iv); };
+    }, []);
+    const [l1, l2] = TITLES[ti].split("|");
+    return React.createElement("div", { className: "decree" + (leaving ? " decree--out" : ""), role: "dialog", "aria-modal": "true", "aria-label": "Emergency test preparation services" },
+        EMBERS.map(e => React.createElement("span", { key: e.id, className: "decree__ember", style: { left: e.left + "%", width: e.size, height: e.size, animationDuration: e.dur + "s", animationDelay: e.delay + "s", "--dx": e.dx + "px" } })),
+        React.createElement("div", { className: "decree__card" },
+            ["tl", "tr", "bl", "br"].map(c => React.createElement("span", { key: c, className: "decree__corner decree__corner--" + c })),
+            React.createElement(Sigil, null),
+            React.createElement("div", { className: "decree__eyebrow dc-s", style: st(.5) }, "By Decree"),
+            React.createElement("h1", { className: "decree__title dc-s", style: st(.8) }, "Emergency Test Preparation Services"),
+            React.createElement("div", { className: "decree__rule dc-s", style: st(1.2) }, "\u25C6"),
+            React.createElement("div", { className: "decree__by dc-s", style: st(1.5) }, "provided to you by"),
+            React.createElement("div", { className: "decree__hh dc-s", style: st(1.9) }, "His Highness"),
+            React.createElement("div", { className: "decree__name dc-s", style: st(2.2) }, "The Supreme Hierophant"),
+            React.createElement("div", { className: "decree__titles dc-s", style: st(2.7), onClick: () => setTi(i => (i + 1) % TITLES.length), title: "Tap for another title" },
+                React.createElement("div", { className: "decree__title-swap", key: ti }, l1, React.createElement("b", null, l2)),
+                React.createElement("div", { className: "decree__count" }, "Title " + String(ti + 1).padStart(2, "0") + " of 43")),
+            React.createElement("button", { className: "decree__all-btn dc-s", "data-nokey": "1", style: st(3.0), onClick: () => setShowAll(true) }, "See all " + TITLES.length + " titles"),
+            React.createElement("button", { className: "decree__btn dc-s", style: st(3.2), onClick: onEnter, autoFocus: true }, "Enter the Lair"),
+            React.createElement("div", { className: "decree__humble dc-s", style: st(3.5) }, "One out of his 43 humble titles"),
+            React.createElement("div", { className: "decree__foot dc-s", style: st(3.8) }, "Surgery II \u00B7 GIT \u00B7 Revision")),
+        showAll && React.createElement("div", { className: "decree__all", "data-nokey": "1" },
+            React.createElement("div", { className: "decree__all-head" }, "The " + TITLES.length + " Humble Titles"),
+            React.createElement("div", { className: "decree__all-sub" }, "Tap one to select it"),
+            React.createElement("div", { className: "decree__all-list" }, TITLES.map((t, i) => {
+                const [a, b] = t.split("|");
+                return React.createElement("button", { key: i, className: "decree__all-item" + (i === ti ? " decree__all-item--cur" : ""), onClick: () => { setTi(i); setShowAll(false); } },
+                    React.createElement("i", null, String(i + 1).padStart(2, "0")),
+                    React.createElement("span", null, a + " ", React.createElement("b", null, b)));
+            })),
+            React.createElement("button", { className: "decree__btn", onClick: () => setShowAll(false), autoFocus: true }, "Back")));
+}
+
+/* ══════════ APP SHELL ══════════ */
+const MODULES = [
+    {
+        id: "upper", Comp: Surg2GIUpperModule, color: "#22c55e",
+        part: "Exam module", name: "Upper GI",
+        desc: "Surgical anatomy, oesophageal obstruction and perforation, peptic ulcer, gastric volvulus and perforation, gastric tumours.",
+        chips: ["Anatomy", "Oesophagus", "Stomach"],
+    },
+];
+
+const LS_KEY = "gitsurg:last";
+function loadLast() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch (e) { return null; }
+}
+function saveLast(v) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(v)); } catch (e) { /* storage may be unavailable */ }
+}
+
+function Home({ onOpen, lastId }) {
+    return React.createElement("div", { className: "home" },
+        React.createElement("div", { className: "home__eyebrow" }, "Surgery II \u00B7 Systemic Diseases"),
+        React.createElement("h1", { className: "home__title" }, "GIT Surgery"),
+        React.createElement("p", { className: "home__sub" }, "Upper GI surgery revision \u2014 exam focus."),
+        MODULES.map(m => React.createElement("button", {
+            key: m.id, className: "tile", style: { "--c": m.color }, onClick: () => onOpen(m.id),
+        },
+            React.createElement("div", { className: "tile__part" }, m.part),
+            React.createElement("div", { className: "tile__name" }, m.name),
+            React.createElement("div", { className: "tile__desc" }, m.desc),
+            React.createElement("div", { className: "tile__chips" }, m.chips.map(c => React.createElement("span", { key: c, className: "chip" }, c))),
+            lastId === m.id && React.createElement("div", { className: "tile__resume" }, "\u21A9 Last opened"))),
+        React.createElement("div", { className: "home__foot" }, "works best added to your home screen"));
+}
+
+function App() {
+    const [decree, setDecree] = useState("show");      // "show" | "leaving" | "gone" — shown on every open
+    const dismissDecree = () => { setDecree("leaving"); setTimeout(() => setDecree("gone"), 600); };
+    const last = loadLast();
+    const [screen, setScreen] = useState("home");       // "home" | module id
+    const [lastId, setLastId] = useState(last && last.id);
+    const open = (id) => { setScreen(id); setLastId(id); saveLast({ id }); };
+    const home = () => setScreen("home");
+
+    /* Android back button / swipe-back returns to the home list instead of closing the app */
+    useEffect(() => {
+        const onPop = () => setScreen("home");
+        window.addEventListener("popstate", onPop);
+        return () => window.removeEventListener("popstate", onPop);
+    }, []);
+    const openWithHistory = (id) => { try { history.pushState({ m: id }, ""); } catch (e) {} open(id); };
+    const homeWithHistory = () => { if (history.state && history.state.m) history.back(); else home(); };
+
+    useEffect(() => { resetScrollTop(); }, [screen]);
+
+    const mod = MODULES.find(m => m.id === screen);
+    return React.createElement(React.Fragment, null,
+      decree !== "gone" && React.createElement(Decree, { onEnter: decree === "show" ? dismissDecree : () => {}, leaving: decree === "leaving" }),
+      React.createElement("div", { className: "app" },
+        React.createElement("div", { className: "topbar" },
+            mod
+                ? React.createElement("button", { className: "topbar__back", onClick: homeWithHistory, "aria-label": "Back to modules" }, "\u2039 Modules")
+                : React.createElement("span", { className: "topbar__spacer" }),
+            React.createElement("div", { className: "topbar__title" }, mod ? "GIT Surgery" : "Surgery II"),
+            React.createElement("span", { className: "topbar__spacer" })),
+        React.createElement("div", { id: "caliph-module-scroll" },
+            mod
+                ? React.createElement("div", { className: "caliph-wrap", key: mod.id }, React.createElement(mod.Comp, { onJump: null }))
+                : React.createElement(Home, { onOpen: openWithHistory, lastId }))));
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App, null));
+})();
+  </script>
+</body>
+</html>
